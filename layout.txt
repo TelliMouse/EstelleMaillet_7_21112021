@@ -1,0 +1,97 @@
+/!\ comment utiliser des cookies
+/!\ comment faire pour qu'un utilisateur puisse poster une image
+/!\ ajouter un moyen d'avoir des modérateurs, qui pourront supprimer des posts ou commentaires
+/!\ comment faire pour avoir des types de données array et object dans MySQL
+/!\ utiliser le plugin helmet pour éviter les attaque XSS
+/!\ ajouter d'autres mime types pour les gif au autres type d'image
+
+
+/login
+toujours la première page quand on ouvre l'app
+champs: [email, mot de passe]
+>backend: pareil que P6 avec token
+header avec logo et 2 icones: login et signup
+petit mot au bas de la page qui renvoit vers signup
+renvoie vers acceuil
+
+BACKEND: sauvegarder le token dans un cookie??????
+        API:/auth/login
+
+MODEL: User:{
+    id: générer par MySQL
+    prénom
+    nom
+    email
+    mot-de-passe
+    modérateur: boolean default false
+}
+relation de un à plusieurs avec les posts et les comments
+
+/signup
+champs: [prénom, nom, email, mot de passe]
+>backend: pareil que P6, et si validé, directement login
+même dispo, sauf le petit mot qui renvoie vers login
+
+BACKEND: API:/auth/signup
+
+/home?page=:page
+header logo à gauche, à droite icone de profil avec prénom et un icone pour post qui renvoie vers l'ancre du post blank
+main colonne, avec les post afficher dans l'ordre du plus récent, avec tout en haut, un endroit où poster un nouveau post
+chaque post doit avoir un titre, et un body qui contient soit une image, soit du texte, et en bas à gauche [like, dislike, grin, angry, heart, meh-rolling-eyes, sad-cry] et à droite le nom de la personne qui a fait le post
+quand on clique sur le poste, on est dirigé vers une page spécifique par post /post?id=:id
+on limite le nombre de posts affiché par page
+
+au niveau du post blank il y a une radio pour choisir image ou texte, et le champ de saisis chage en fonction de la radio
+
+BACKEND: pour récupérer le prénom: API:/users/:id (id récupéré dans le cookie avec le token)
+        pour récupérer et poster les posts API:/posts
+
+MODEL: POST: {
+    id: généré par MySQL
+    titre
+    text:
+    imageUrl
+    imageAlt 
+    like: int
+    dislike
+    grin
+    angry 
+    heart
+    meh
+    sad
+    usersLike: array avec userID des utilisateur qui ont réagis
+    usersDislike
+    ...
+    userID: userID de la personne qui a fait le post
+    modifié: boolean default false
+}
+relation de un à plusieurs avec les users et comments
+
+/post?id=:id
+On a le titre en haut
+puis le body
+les interactions et le nom
+si c'est notre propre post, des boutons modifications et supprimer
+ajouter un mot 'modifié' si le post est modifié
+puis les commentaires trier par ordre du plus ancien
+
+les commentaires:
+nom de la personne qui a commenter
+le message (uniquement du texte)
+les réactions
+et si c'est la personne qui a écrit le texte, un bouton supprimer et modifier
+ajouter un mot 'modifié' si le com a été modifié
+
+BACKEND: récupérer le post API:/posts/:id
+        récupérer les commentaires API:/posts/:id/comments
+
+MODEL: COMMENT: {
+    id: généré par MySQL
+    userID: id du user qui a écrit le comment
+    postID: id du post auquel il se rapporte
+    text:
+    réactions
+    array des user qui ont réagis
+    modifié: boolean default false
+}
+relation de un à plusieurs vers user et post
