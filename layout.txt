@@ -90,6 +90,5 @@ MODEL: COMMENT: {
     text:
     réactions
     array des user qui ont réagis
-    modifié: boolean default false
 }
 relation de un à plusieurs vers user et post
