@@ -1,9 +1,10 @@
-/!\ comment utiliser des cookies
+/!\ comment utiliser des cookies => juste new Cookies ?....
 /!\ comment faire pour qu'un utilisateur puisse poster une image
 /!\ ajouter un moyen d'avoir des modérateurs, qui pourront supprimer des posts ou commentaires
-/!\ comment faire pour avoir des types de données array et object dans MySQL
+/!\ comment faire pour avoir des types de données array et object dans MySQL => utiliser JSON.stringify pour envoyer dans la DB, et JSON.parse pour récupérer les trucs
 /!\ utiliser le plugin helmet pour éviter les attaque XSS
 /!\ ajouter d'autres mime types pour les gif au autres type d'image
+/!\ les modèles n'ont pas encore été créés dans MySQL
 
 
 /login
@@ -23,7 +24,6 @@ MODEL: User:{
     nom
     email
     mot-de-passe
-    modérateur: boolean default false
 }
 relation de un à plusieurs avec les posts et les comments
 
@@ -59,11 +59,10 @@ MODEL: POST: {
     heart
     meh
     sad
-    usersLike: array avec userID des utilisateur qui ont réagis
+    usersLike: array avec userID des utilisateur qui ont réagis (TEXT)
     usersDislike
     ...
     userID: userID de la personne qui a fait le post
-    modifié: boolean default false
 }
 relation de un à plusieurs avec les users et comments
 
@@ -71,8 +70,7 @@ relation de un à plusieurs avec les users et comments
 On a le titre en haut
 puis le body
 les interactions et le nom
-si c'est notre propre post, des boutons modifications et supprimer
-ajouter un mot 'modifié' si le post est modifié
+si c'est notre propre post, des boutons supprimer
 puis les commentaires trier par ordre du plus ancien
 
 les commentaires:
