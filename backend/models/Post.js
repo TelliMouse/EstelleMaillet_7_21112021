@@ -1,13 +1,14 @@
 const Post = (post) => {
     this.title = post.title,
-    this.userId = post.userId,
-    this.text = post.text,
-    this.imageUrl = post.imageUrl,
-    this.imageAlt = post.imageAlt,
+    this.user_id = post.user_id,
+    this.text = post.text, //can be null
+    this.imageUrl = post.imageUrl, //can be null
+    this.imageAlt = post.imageAlt,  //can be null
     this.likes = post.likes,
     this.dislikes = post.dislikes,
     this.usersLike = post.usersLike,
-    this.usersDislike = post.usersDislike
+    this.usersDislike = post.usersDislike,
+    this.date = post.date
 };
 
 module.exports = Post;

@@ -3,4 +3,17 @@ POST    /api/users/login        {email: String, password: String}
         res                     {id: String, token: String}  
 GET     /api/users/:id          {}
         res                     {id: Integer, firstname: String, lastname: String, email; String, password: String}
-POST    /api/posts
+POST    /api/posts              {title: String, text: String, imageUrl: String, imageAlt: String, user_id: Integer, date: String}
+DELETE  /api/posts/:id          {}
+GET     /api/posts/:id          {}
+        res                     {toutes les charactéristiques du post}
+GET     /api/posts              {}
+        res                     {array de tous les objets Post}
+PUT     /api/posts/:id          {soit comme pour GET avec les champs à modifier, soit image: file et post: JSON}
+POST    /api/posts/:id/like     {user_id: Integer, like: 1, -1 ou 0}
+GET     /api/posts/:id/comments {}     
+        res                     {array de tous les comments}
+POST    /api/comments           {user_id, post_id, text, date}
+PUT     /api/comments/:id       {les champs à modifier}
+DELETE  /api/comments/:id       {}
+POST    /api/comments/:id/like  {user_id, like}
