@@ -28,14 +28,17 @@ exports.login = (req, res, next) => {
                 if(!valid) {
                     return res.status(401).json({message: 'Password is invalid!'})
                 }
-                res.status(200).json({
-                    id: result.id,
-                    token: jwt.sign(
+                const cookieJWT = req.cookies.JWT
+                if(cookieJWT === undefined) {
+                    const token = jwt.sign(
                         {user_id: result.id},
                         process.env.TOKEN_SECRET,
                         {expiresIn: '24h'}
                     )
-                });
+                    res.cookies('jwt', token, { maxAge: 86400, httpOnly: true }).status(200).json(result[0].id);
+                } else {
+                    res.status(200).json(result[0].id);
+                }
             })
             .catch(error => res.status(500).json({ error }));
         }

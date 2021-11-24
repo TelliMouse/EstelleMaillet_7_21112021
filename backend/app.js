@@ -1,5 +1,6 @@
 const express = require('express');
-const path = require('path')
+const path = require('path');
+const cookieParser = require('cookie-parser');
 
 const userRoutes = require('./routes/user.routes');
 const postRoutes = require('./routes/post.routes');
@@ -17,6 +18,8 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+
+app.use(cookieParser());
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
