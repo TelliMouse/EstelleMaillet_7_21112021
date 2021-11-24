@@ -47,4 +47,11 @@ exports.getUserById = (req, res, next) => {
         if(error) res.status(404).json({ error });
         res.status(200).json(result[0]);
     })
+};
+
+exports.getAllUsers = (req, res, next) => {
+    sql.query('SELECT * FROM user', (error, result) => {
+        if(error) res.status(400).json({ error });
+        res.status(200).json(result);
+    })
 }
