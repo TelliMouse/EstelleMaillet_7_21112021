@@ -5,14 +5,15 @@ import router from './router'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import store from './store'
 
 library.add(faUserSecret)
 
-createApp().component('font-awesome-icon', FontAwesomeIcon)
+createApp().use(store).component('font-awesome-icon', FontAwesomeIcon)
 
-createApp().config.productionTip = false
+createApp().use(store).config.productionTip = false
 
-createApp(App).use(router).mount('#app')
+createApp(App).use(store).use(router).mount('#app')
 
 /*new Vue({
     el: '#app',

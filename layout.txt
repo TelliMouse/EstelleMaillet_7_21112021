@@ -1,10 +1,7 @@
-/!\ comment utiliser des cookies => juste new Cookies ?....
 /!\ comment faire pour qu'un utilisateur puisse poster une image
 /!\ ajouter un moyen d'avoir des modérateurs, qui pourront supprimer des posts ou commentaires
-/!\ comment faire pour avoir des types de données array et object dans MySQL => utiliser JSON.stringify pour envoyer dans la DB, et JSON.parse pour récupérer les trucs
 /!\ utiliser le plugin helmet pour éviter les attaque XSS
-/!\ les modèles n'ont pas encore été créés dans MySQL (sauf user)
-/!\ si en faite, faut que je fasse des posts qu'avec du texte ou qu'avec une image
+/!\ si en fait, faut que je fasse des posts qu'avec du texte ou qu'avec une image
 
 
 /login
@@ -106,3 +103,4 @@ juste blank page avec form et tout
 -avoir currentUserId dans le data global????
 -avoir la function de login dans le data globale pour l'uitiliser après le signup (elle renvoie systématiquement vers la page posts)
 -lorsque qu'on modifie une image, demander à changer l'imageAlt
+-vérifier si un path peut avoir 2 routes

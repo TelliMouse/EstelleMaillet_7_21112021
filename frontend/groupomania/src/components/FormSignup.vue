@@ -16,11 +16,13 @@
 <script>
 export default {
     name: "FormSignup",
-    data: {
+    data() {
+        return {
         firstname: '',
         lastname: '',
         email: '',
         password: ''
+        };
     },
     methods: {
         createUser(user) {
@@ -35,6 +37,21 @@ export default {
             .then(res => res.json())
             .catch(err => console.log('Error createUser', err));
         },
+        loginUser(user) {
+            fetch('http://localhost:3000/api/users/login', {
+                method: 'POST',
+                headers: {
+                    "Accept": "application/json", 
+                    "Content-Type": "application/json"
+                },
+                body: {
+                    email: user.email,
+                    password: user.password
+                }
+            })
+            .then(res => res.json())
+            .catch(err => console.log('Error loginUser', err));
+        },
         retrieveUserList() {
             fetch('http://localhost:3000/api/users')
             .then(res => res.json())
@@ -47,10 +64,10 @@ export default {
                 return false;
             }
         },
-        async isTheEmailUnique() {
-            const userList = await this.retrieveUserList();
+        isTheEmailUnique() {
+            const userList = this.retrieveUserList();
             for(let user of userList) {
-                if(user.email === email) {
+                if(user.email === this.email) {
                     return false;
                 }
             }
@@ -65,9 +82,11 @@ export default {
                     password: this.password
                 };
                 this.createUser(user);
-                
+                const userId = this.loginUser(user);
+                localStorage.setItem('currentUserId', userId);
+                this.$router.push({ name: 'Posts'});
             } else {
-                alert('Veuillez remplir tous les champs du formulaire');
+                alert('Veuillez remplir tous les champs du formulaire et n\'avoir utilisé qu\'une fois votre email');
             }
         }
     }
