@@ -2,18 +2,14 @@
     <header>
         <img src="../assets/icon-left-font-monochrome-black.png" />
         <nav>
-            <!--<font-awesome-icon icon="['fas', 'fa-sign-in-alt']" />
-            <font-awesome-icon icon="['fas', 'fa-user-plus']" />-->
             <router-link to="/login">
                 <img class="icon" src="../assets/sign-in-alt-solid.svg"/>
                 <p>Se connecter</p>
             </router-link>
-            <router-view/>
             <router-link to="/signup">
                 <img class="icon" src="../assets/user-plus-solid.svg"/>
                 <p>S'inscrire</p>
             </router-link>
-            <router-view/>
         </nav>
     </header>
 </template>
@@ -25,7 +21,7 @@
 //library.add(faUserPlus)
 
 export default {
-    name: 'Header'
+    name: 'HeaderLogin'
 }
 </script>
 

@@ -1,23 +1,26 @@
 <template>
     <div>
-        <Header/>
-        <FormSpace welcome="Ravi de vous revoir!" linkTo="Pas encore inscrit? C\'est par ici!" link="/signup" />
+        <HeaderLogin/>
+        <FormSpace 
+            welcome="Ravi de vous revoir!" 
+            linkTo="Pas encore inscrit? C\'est par ici!" 
+            link="/signup">
+        <FormLogin />
+        </FormSpace>
     </div>
 </template>
 
 <script>
-import Header from '../components/Header.vue'
-//import LoginIcons from '../components/LoginIcons.vue'
-//import FormLogin from '../components/FormLogin.vue'
+import HeaderLogin from '../components/HeaderLogin.vue'
+import FormLogin from '../components/FormLogin.vue'
 import FormSpace from '../components/FormSpace.vue'
 
 export default {
     name: 'Login',
-    components: {
-        Header, 
-        //LoginIcons,
-        //FormLogin,
-        FormSpace
+    components: { 
+        FormLogin,
+        FormSpace,
+        HeaderLogin
     }
 }
 </script>

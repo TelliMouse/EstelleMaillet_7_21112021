@@ -4,6 +4,7 @@
         <input type="email" name="email">
         <label for="password">Mot-de-passe:</label>
         <input type="password" name="password">
+        <button>Se connecter</button>
     </div>
 </template>
 

@@ -1,8 +1,6 @@
 <template>
     <div>
-        <Header>
-            <LoginIcons/>
-        </Header>
+        <HeaderLogin />
         <FormSpace
             welcome="Bienvenue!"
             linkTo="Déjà inscrit? C\'est par ici!"
@@ -13,16 +11,14 @@
 </template>
 
 <script>
-import Header from '../components/Header.vue'
-import LoginIcons from '../components/LoginIcons.vue'
 import FormSignup from '../components/FormSignup.vue'
 import FormSpace from '../components/FormSpace.vue'
+import HeaderLogin from '../components/HeaderLogin'
 
 export default {
     name: 'Signup',
     components: {
-        Header, 
-        LoginIcons,
+        HeaderLogin,
         FormSignup,
         FormSpace
     }

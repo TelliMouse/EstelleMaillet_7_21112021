@@ -4,6 +4,7 @@
 /!\ comment faire pour avoir des types de données array et object dans MySQL => utiliser JSON.stringify pour envoyer dans la DB, et JSON.parse pour récupérer les trucs
 /!\ utiliser le plugin helmet pour éviter les attaque XSS
 /!\ les modèles n'ont pas encore été créés dans MySQL (sauf user)
+/!\ si en faite, faut que je fasse des posts qu'avec du texte ou qu'avec une image
 
 
 /login

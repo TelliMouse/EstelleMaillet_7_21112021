@@ -1,14 +1,8 @@
 <template>
     <div class="form-space">
-        <h1>{{ Welcome }}</h1>
-        <div>
-            <label for="email">Email:</label>
-            <input type="email" name="email">
-            <label for="password">Mot-de-passe:</label>
-            <input type="password" name="password">
-        </div>
-        <router-link to="{{ link }}"><p>{{ LinkTo }}</p></router-link>
-        <router-view/>
+        <h1>{{ welcome }}</h1>
+        <slot></slot>
+        <router-link to="{{ link }}"><p>{{ linkTo }}</p></router-link>
     </div>    
 </template>
 
@@ -31,7 +25,7 @@ export default {
 </script>
 
 <style>
-.formspace {
+.form-space {
     background-color: #BBC8CA;
 }
 </style>
