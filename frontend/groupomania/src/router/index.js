@@ -6,6 +6,7 @@ import Signup from '../views/Signup.vue'
 import Posts from '../views/Posts.vue'
 import NewPost from '../views/NewPost.vue'
 import Post from '../views/Post.vue'
+import Test from '../views/Test.vue'
 
 const routes = [
   {
@@ -45,6 +46,11 @@ const routes = [
     path: '/post?id=:id',
     name: 'Post',
     component: Post
+  },
+  {
+    path: '/test',
+    name: 'Test',
+    component: Test
   }
 ]
 

@@ -32,7 +32,7 @@ export default {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
                 },
-                body: { user }
+                body: { ...user }
             })
             .then(res => res.json())
             .catch(err => console.log('Error createUser', err));

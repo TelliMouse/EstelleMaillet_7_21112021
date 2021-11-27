@@ -12,7 +12,10 @@
             :likeNumber="post.likes"
             :dislikeNumber="post.dislikes"
             :date="getDate(post.id)"
-            :postId="post.id"/>
+            :modConditions="false"
+            :modConditionsAndAdmin="false"
+            :postTextPost="textPost(post.id)"
+            :postImagePost="imagePost(post.id)"/>
         <Pages />
     </div>
 </template>
@@ -43,7 +46,9 @@ export default {
         },
         getDate(postId) {
             return postId
-        }
+        },
+        textPost(postId) {},
+        imagePost(postId) {}
     }
 }
 </script>
