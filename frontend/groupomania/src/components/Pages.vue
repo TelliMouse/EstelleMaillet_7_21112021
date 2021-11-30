@@ -24,8 +24,49 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
-    name: 'Pages'
+    name: 'Pages',
+    computed: {
+        ...mapState(['numberOfPages'])
+    },
+    methods: {
+        isThereAPreviousPage() {
+            const url = window.location.href;
+            const urlParams = new URLSearchParams(url);
+            let currentPage;
+
+            if(!urlParams.get('page')) {
+                currentPage = 1;
+            } else {
+                currentPage = parseInt(urlParams.get('page'), 10);
+            }
+
+            if(currentPage > 1) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        isThereANextPage() {
+            const url = window.location.href;
+            const urlParams = new URLSearchParams(url);
+            let currentPage;
+
+            if(!urlParams.get('page')) {
+                currentPage = 1;
+            } else {
+                currentPage = parseInt(urlParams.get('page'), 10);
+            }
+
+            if(currentPage < this.numberOfPages) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
 }
 </script>
 
