@@ -32,7 +32,7 @@ export default {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
                 },
-                body: { ...user }
+                body: JSON.stringify({ ...user })
             })
             .then(res => res.json())
             .catch(err => console.log('Error createUser', err));
@@ -44,10 +44,10 @@ export default {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
                 },
-                body: {
+                body: JSON.stringify({
                     email: user.email,
                     password: user.password
-                }
+                })
             })
             .then(res => res.json())
             .catch(err => console.log('Error loginUser', err));

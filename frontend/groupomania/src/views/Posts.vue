@@ -47,8 +47,12 @@ export default {
         getDate(postId) {
             return postId
         },
-        textPost(postId) {},
-        imagePost(postId) {}
+        textPost(postId) {
+            return postId;
+        },
+        imagePost(postId) {
+            return postId;
+        }
     }
 }
 </script>

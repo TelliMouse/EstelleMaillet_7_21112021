@@ -2,21 +2,19 @@
     <div>
         <h3>{{ userName }}</h3>
         <textarea name="textarea" rows="5" cols="30" readonly v-model="comment"></textarea>
-        <LikesAndButtons 
-            likeNumber="{{ likeNumber }}"
-            dislikeNumber="{{ dislikeNumber }}"
-            date="{{ date }}" />
+        <div>
+            <div>
+                <button><img src="../assets/thumbs-up-solid.svg" alt="Icone de like"/> {{ likeNumber }}</button>
+                <button><img src="../assets/thumbs-down-solid.svg" alt="Icon de dislike"/> {{ dislikeNumber }}</button>
+            </div>
+            <p>{{ date }}</p>
+        </div>
     </div>
 </template>
 
 <script>
-import LikesAndButtons from './LikesAndButtons.vue'
-
 export default {
     name: 'PublishedComment',
-    components: {
-        LikesAndButtons
-    },
     props: {
         userName: String,
         propComment: String,
