@@ -104,3 +104,4 @@ juste blank page avec form et tout
 -avoir la function de login dans le data globale pour l'uitiliser après le signup (elle renvoie systématiquement vers la page posts)
 -lorsque qu'on modifie une image, demander à changer l'imageAlt
 -vérifier si un path peut avoir 2 routes
+-vérifier comment les components s'affichent après un update à un comment/post

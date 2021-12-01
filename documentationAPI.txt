@@ -20,4 +20,6 @@ GET     /api/posts/:id/comments {}
 POST    /api/comments           {user_id, post_id, text, date}
 PUT     /api/comments/:id       {les champs à modifier}
 DELETE  /api/comments/:id       {}
+GET     /api/comments/:id       {}
+        res                     {infos sur le comment}
 POST    /api/comments/:id/like  {user_id, like}

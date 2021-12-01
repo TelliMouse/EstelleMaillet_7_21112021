@@ -29,6 +29,7 @@
             <button v-if="modConditions || modConditionsAndAdmin" @click="deletePost">Supprimer</button>
             <input/>
         </div>
+        <router-link to="{{ linkToPost }}" v-if="needLinkToPost">Voir la publication</router-link>
     </div>
 </template>
 
@@ -48,7 +49,9 @@ export default {
         postId: Number,
         postModConditions: Boolean,
         postImagePost: Boolean,
-        userId: Number //id of the user who made the post
+        userId: Number, //id of the user who made the post
+        linkToPost: String,
+        postNeedLinkToPost: Boolean
     },
     data() {
         return {
@@ -59,8 +62,9 @@ export default {
             modelTitle: this.postTitle,
             modelPost: this.post,
             modelImageAlt: this.imageAlt,
-            liked: false,
-            disliked: false
+            liked: this.isLiked(),
+            disliked: this.isDisliked(),
+            needLinkToPost: this.postNeedLinkToPost
         }
     },
     methods: {
@@ -92,17 +96,21 @@ export default {
         },
         isLiked() {
             if(this.hasTheUserAlreadyLiked() === 'liked') {
-                this.liked = true;
+                return true;
+            } else {
+                return false;
             }
         },
         isDisliked() {
             if(this.hasTheUserAlreadyLiked() === 'disliked') {
-                this.disliked = true;
+                return true;
+            } else {
+                return false;
             }
         },
         likeClicked() {
             if(this.hasTheUserAlreadyLiked() === false) {
-                fetch(`http://localhost:3000/api/${this.postId}`, {
+                fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: POST,
                     headers: {
                     "Accept": "application/json", 
@@ -119,7 +127,7 @@ export default {
                 })
                 .catch(err => console.log('Error likeClicked', err));
             } else if(this.hasTheUserAlreadyLiked() === 'liked') {
-                fetch(`http://localhost:3000/api/${this.postId}`, {
+                fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: POST,
                     headers: {
                     "Accept": "application/json", 
@@ -142,7 +150,7 @@ export default {
         },
         dislikeClicked() {
             if(this.hasTheUserAlreadyLiked() === false) {
-                fetch(`http://localhost:3000/api/${this.postId}`, {
+                fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: POST,
                     headers: {
                     "Accept": "application/json", 
@@ -159,7 +167,7 @@ export default {
                 })
                 .catch(err => console.log('Error dislikeClicked', err));
             } else if(this.hasTheUserAlreadyLiked() === 'disliked') {
-                fetch(`http://localhost:3000/api/${this.postId}`, {
+                fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: POST,
                     headers: {
                     "Accept": "application/json", 
@@ -237,7 +245,7 @@ export default {
         },
         modConditions() {
             const currentUserId = JSON.parse(localStorage.getItem('currentUserId'));
-            if(currentUserId == this.postId && this.postModConditions) {
+            if(currentUserId == this.userId && this.postModConditions) {
                 return true;
             } else {
                 return false;

@@ -16,7 +16,9 @@
             :postModConditions="false"
             :postTextPost="post.text" 
             :postImagePost="post.imageUrl"
-            :userId="post.user_id"/>
+            :userId="post.user_id"
+            :linkToPost="getLinkToPost(post.id)"
+            :postNeedLinkToPost="true"/>
         <Pages />
     </div>
 </template>
@@ -106,6 +108,9 @@ export default {
                 return postList;
             })
             .catch(err => console.log('Error getPostList', err));
+        },
+        getLinkToPost(postId) {
+            return `/post?id=${postId}`;
         }
     }
 }
