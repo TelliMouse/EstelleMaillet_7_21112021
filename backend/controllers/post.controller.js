@@ -168,6 +168,13 @@ exports.getAllPosts = (req, res, next) => {
     })
 };
 
+exports.getAllPostsOrderDesc = (req, res, next) => {
+    sql.query('SELECT * FROM post ORDER BY date DESC', (error, result) => {
+        if(error) res.status(400).json({ error });
+        res.status(200).json(result);
+    })
+};
+
 exports.getAllCommentsFromPost = (req, res, next) => {
     //select * from comment where post_id = req.params.id
     sql.query(`SELECT * FROM comment WHERE post_id = ${req.params.id}`, (error, result) => {

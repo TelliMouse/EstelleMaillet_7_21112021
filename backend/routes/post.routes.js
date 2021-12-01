@@ -11,5 +11,6 @@ router.put('/:id', auth, multer, postCtrl.modifyPost);
 router.post('/:id/like', auth, postCtrl.likePost);
 router.get('/', auth, postCtrl.getAllPosts);
 router.get('/:id/comments', auth, postCtrl.getAllCommentsFromPost);
+router.get('/desc', auth, postCtrl.getAllPostsOrderDesc)
 
 module.exports = router;
