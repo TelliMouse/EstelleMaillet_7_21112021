@@ -17,8 +17,8 @@
         <p v-if="imagePost && modifyClicked">Avoir des textes alternatifs pour vos images permet d'avoir un contenu plus accessible pour les personnes malvoyantes</p>
         <div>
             <div>
-                <button @click="likeClicked"><img v-if="liked" src="../assets/thumbs-up-solid.svg" alt="Icone de like"/><img v-if="!liked" src="../assets/thumbs-up-solid.svg" alt="Icone de like"/> {{ likeNumber }}</button>
-                <button @click="dislikeClicked"><img v-if="disliked" src="../assets/thumbs-down-solid.svg" alt="Icon de dislike"/><img v-if="!disliked" src="../assets/thumbs-down-solid.svg" alt="Icon de dislike"/> {{ dislikeNumber }}</button>
+                <button @click="likeClicked"><img v-if="liked" src="../assets/thumbs-up-solid.svg" alt="Icone de like"/><img v-if="!liked" src="../assets/thumbs-up-solid.svg" alt="Icone de like"/> {{ shownLikeNumber }}</button>
+                <button @click="dislikeClicked"><img v-if="disliked" src="../assets/thumbs-down-solid.svg" alt="Icon de dislike"/><img v-if="!disliked" src="../assets/thumbs-down-solid.svg" alt="Icon de dislike"/> {{ shownDislikeNumber }}</button>
             </div>
             <p>{{ date }}</p>
         </div>
@@ -64,7 +64,9 @@ export default {
             modelImageAlt: this.imageAlt,
             liked: this.isLiked(),
             disliked: this.isDisliked(),
-            needLinkToPost: this.postNeedLinkToPost
+            needLinkToPost: this.postNeedLinkToPost,
+            shownLikeNumber: this.likeNumber,
+            shownDislikeNumber: this.dislikeNumber
         }
     },
     methods: {
@@ -111,7 +113,7 @@ export default {
         likeClicked() {
             if(this.hasTheUserAlreadyLiked() === false) {
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
-                    method: POST,
+                    method: 'POST',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -122,13 +124,13 @@ export default {
                     })
                 })
                 .then(() => {
-                    this.likeNumber++;
+                    this.shownLikeNumber++;
                     this.liked = true;
                 })
                 .catch(err => console.log('Error likeClicked', err));
             } else if(this.hasTheUserAlreadyLiked() === 'liked') {
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
-                    method: POST,
+                    method: 'POST',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -139,7 +141,7 @@ export default {
                     })
                 })
                 .then(() => {
-                    this.likeNumber--;
+                    this.shownLikeNumber--;
                     this.liked = false;
                 })
                 .catch(err => console.log('Error likeClicked', err));
@@ -151,7 +153,7 @@ export default {
         dislikeClicked() {
             if(this.hasTheUserAlreadyLiked() === false) {
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
-                    method: POST,
+                    method: 'POST',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -162,13 +164,13 @@ export default {
                     })
                 })
                 .then(() => {
-                    this.dislikeNumber++;
+                    this.shownDislikeNumber++;
                     this.disliked = true;
                 })
                 .catch(err => console.log('Error dislikeClicked', err));
             } else if(this.hasTheUserAlreadyLiked() === 'disliked') {
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
-                    method: POST,
+                    method: 'POST',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -179,7 +181,7 @@ export default {
                     })
                 })
                 .then(() => {
-                    this.dislikeNumber--;
+                    this.shownDislikeNumber--;
                     this.disliked = false;
                 })
                 .catch(err => console.log('Error dislikeClicked', err));

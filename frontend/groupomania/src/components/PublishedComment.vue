@@ -5,8 +5,8 @@
         <textarea v-if="modifyClicked" name="textarea" v-model="comment"></textarea>
         <div>
             <div>
-                <button @click="likeClicked"><img v-if="liked" src="../assets/thumbs-up-solid.svg" alt="Icone de like"/><img v-if="!liked" src="../assets/thumbs-up-solid.svg" alt="Icone de like"/> {{ likeNumber }}</button>
-                <button @click="dislikeClicked"><img v-if="disliked" src="../assets/thumbs-down-solid.svg" alt="Icon de dislike"/><img v-if="!disliked" src="../assets/thumbs-down-solid.svg" alt="Icon de dislike"/> {{ dislikeNumber }}</button>
+                <button @click="likeClicked"><img v-if="liked" src="../assets/thumbs-up-solid.svg" alt="Icone de like"/><img v-if="!liked" src="../assets/thumbs-up-solid.svg" alt="Icone de like"/> {{ shownLikeNumber }}</button>
+                <button @click="dislikeClicked"><img v-if="disliked" src="../assets/thumbs-down-solid.svg" alt="Icon de dislike"/><img v-if="!disliked" src="../assets/thumbs-down-solid.svg" alt="Icon de dislike"/> {{ shownDislikeNumber }}</button>
             </div>
             <p>{{ date }}</p>
         </div>
@@ -37,7 +37,9 @@ export default {
             comment: this.propComment,
             liked: this.isLiked(),
             disliked: this.isDisliked(),
-            modifyClicked: false
+            modifyClicked: false,
+            shownLikeNumber: this.likeNumber,
+            shownDislikeNumber: this.dislikeNumber
         }
     },
     methods: {
@@ -84,7 +86,7 @@ export default {
         likeClicked() {
             if(this.hasTheUserAlreadyLiked() === false) {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
-                    method: POST,
+                    method: 'POST',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -95,13 +97,13 @@ export default {
                     })
                 })
                 .then(() => {
-                    this.likeNumber++;
+                    this.shownLikeNumber++;
                     this.liked = true;
                 })
                 .catch(err => console.log('Error likeClicked', err));
             } else if(this.hasTheUserAlreadyLiked() === 'liked') {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
-                    method: POST,
+                    method: 'POST',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -112,7 +114,7 @@ export default {
                     })
                 })
                 .then(() => {
-                    this.likeNumber--;
+                    this.shownLikeNumber--;
                     this.liked = false;
                 })
                 .catch(err => console.log('Error likeClicked', err));
@@ -124,7 +126,7 @@ export default {
         dislikeClicked() {
             if(this.hasTheUserAlreadyLiked() === false) {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
-                    method: POST,
+                    method: 'POST',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -135,13 +137,13 @@ export default {
                     })
                 })
                 .then(() => {
-                    this.dislikeNumber++;
+                    this.shownDislikeNumber++;
                     this.disliked = true;
                 })
                 .catch(err => console.log('Error dislikeClicked', err));
             } else if(this.hasTheUserAlreadyLiked() === 'disliked') {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
-                    method: POST,
+                    method: 'POST',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -152,7 +154,7 @@ export default {
                     })
                 })
                 .then(() => {
-                    this.dislikeNumber--;
+                    this.shonwDislikeNumber--;
                     this.disliked = false;
                 })
                 .catch(err => console.log('Error dislikeClicked', err));
