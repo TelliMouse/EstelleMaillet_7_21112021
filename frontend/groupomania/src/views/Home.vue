@@ -13,6 +13,9 @@ export default {
   name: 'Home',
   components: {
     HelloWorld
+  },
+  beforeMount() {
+    this.$router.push('Posts');
   }
 }
 </script>
