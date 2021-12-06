@@ -19,7 +19,8 @@
             postNeedLinkToPost="{{ false }}"/>
         <BlankComment 
             postId="{{ post.id }}"
-            userName="{{ getUserName(parseInt(localStorage.getItem('currentUserId'), 10)) }}"/>
+            userName="{{ getUserName(parseInt(localStorage.getItem('currentUserId'), 10)) }}"
+            @new-comment-publisehd="reloadPage"/>
         <PublishedComment 
             v-for="comment in commentList"
             :key="comment.id"
@@ -117,6 +118,9 @@ export default {
             })
             .catch(err => console.log('Error getComments', err));
         },
+        reloadPage() {
+            this.$forceUpdate();
+        }
     }
 }
 </script>

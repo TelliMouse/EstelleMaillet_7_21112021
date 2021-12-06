@@ -216,7 +216,7 @@ export default {
                 })
                 .then(() => {
                     alert('La publication a bien été modifiée!')
-                    this.$router.push({ name: 'Posts'});
+                    this.$forceUpdate();
                 })
                 .catch(err => console.log('Error modifyPost', err))
             } else {
@@ -230,7 +230,7 @@ export default {
                 })
                 .then(() => {
                     alert('La publication a bien été modifiée!')
-                    this.$router.push({ name: 'Posts'});
+                    this.$forceUpdate();
                 })
                 .catch(err => console.log('Error modifyPost', err))
             }
@@ -241,7 +241,7 @@ export default {
             })
             .then(() => {
                 alert('La publication a bien été supprimée.');
-                this.$router.push({ name: 'Posts'});
+                this.$forceUpdate();
             })
             .catch(err => console.log('Error deletePost', err));
         },

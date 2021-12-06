@@ -6,7 +6,7 @@
                 <img class="icon" src="../assets/plus-circle-solid.svg"/>
                 <p>Nouveau Post</p>
             </router-link>
-            <router-link to="/login">
+            <router-link to="/login" @click="wipeLocalStorage">
                 <img class="icon" src="../assets/sign-out-alt-solid.svg"/>
                 <p>Quitter</p>
             </router-link>
@@ -16,7 +16,12 @@
 
 <script>
 export default {
-    name: 'HeaderPost'
+    name: 'HeaderPost',
+    methods: {
+        wipeLocalStorage() {
+            localStorage.clear();
+        }
+    }
 }
 </script>
 
