@@ -15,7 +15,7 @@ export default {
     HelloWorld
   },
   beforeMount() {
-    this.$router.push('Posts');
+    this.$router.push({ path: '/login' });
   }
 }
 </script>

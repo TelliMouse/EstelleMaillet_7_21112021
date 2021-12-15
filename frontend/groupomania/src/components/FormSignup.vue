@@ -1,5 +1,6 @@
 <template>
     <div>
+        <h1>Bienvenue!</h1>
         <label for="firstname">Prénom:</label>
         <input v-model="firstname" type="text" name="firstname" required>
         <label for="lastname">Nom:</label>
@@ -10,6 +11,7 @@
         <label for="password">Mot-de-passe:</label>
         <input v-model="password" type="password" name="password" required>
         <button @click="signup">S'inscrire</button>
+        <router-link to="/login">Déjà inscrit? C'est par ici!</router-link>
     </div>
 </template>
 
@@ -25,6 +27,11 @@ export default {
         };
     },
     methods: {
+        /**
+         * Create a new user through a request to the API
+         * @param {Object} user
+         * @returns {Json} res.json()
+         */
         createUser(user) {
             fetch('http://localhost:3000/api/users/signup', {
                 method: 'POST',
@@ -37,7 +44,46 @@ export default {
             .then(res => res.json())
             .catch(err => console.log('Error createUser', err));
         },
-        loginUser(user) {
+        /**
+         * Retrieve the list of all users
+         * @returns {Json} res.json() -array of all users-
+         */
+        retrieveUserList() {
+            fetch('http://localhost:3000/api/users')
+            .then(res => res.json())
+            .catch(err => console.log('Error retrieveUserList', err));
+        },
+        /**
+         * Verifies if all field of the form are complete
+         * @returns {Boolean}
+         */
+        isTheFormComplete() {
+            if(this.firstname && this.lastname && this.email && this.password) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        /**
+         * Retrieve a list of all users, and verifies if the email inputed isn't already used
+         * @returns {Boolean}
+         */
+        isTheEmailUnique() {
+            const userList = this.retrieveUserList();
+            if(userList) {
+                for(let user of userList) {
+                    if(user.email === this.email) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        },
+        /**
+         * Authentifies a user though a request to the API, then sets the current user's id in the LocalStorage, and redirects to the main page
+         * @param {Object} user
+         */
+        login(user) {
             fetch('http://localhost:3000/api/users/login', {
                 method: 'POST',
                 headers: {
@@ -49,30 +95,22 @@ export default {
                     password: user.password
                 })
             })
+            //res is a promise, and on this iteration, if you don't use twice .then(), result.id is undefined because res will be pending
             .then(res => res.json())
+            .then(result => {
+                const userId = result.id;
+                if(userId) {
+                    localStorage.setItem('currentUserId', userId);
+                    this.$router.push({ name: 'Posts'});
+                } else {
+                    alert('Une erreur s\'est produite');
+                }
+            })
             .catch(err => console.log('Error loginUser', err));
         },
-        retrieveUserList() {
-            fetch('http://localhost:3000/api/users')
-            .then(res => res.json())
-            .catch(err => console.log('Error retrieveUserList', err));
-        },
-        isTheFormComplete() {
-            if(this.firstname && this.lastname && this.email && this.password) {
-                return true;
-            } else {
-                return false;
-            }
-        },
-        isTheEmailUnique() {
-            const userList = this.retrieveUserList();
-            for(let user of userList) {
-                if(user.email === this.email) {
-                    return false;
-                }
-            }
-            return true;
-        },
+        /**
+         * Create a new user in the database, then authentifies them with login() (see previous function)
+         */
         signup() {
             if(this.isTheFormComplete() && this.isTheEmailUnique()) {
                 const user = {
@@ -82,9 +120,7 @@ export default {
                     password: this.password
                 };
                 this.createUser(user);
-                const userId = this.loginUser(user);
-                localStorage.setItem('currentUserId', userId);
-                this.$router.push({ name: 'Posts'});
+                this.login(user);
             } else {
                 alert('Veuillez remplir tous les champs du formulaire et n\'avoir utilisé qu\'une fois votre email');
             }
