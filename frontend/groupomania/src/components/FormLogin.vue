@@ -42,6 +42,8 @@ export default {
                 };
                 fetch('http://localhost:3000/api/users/login', {
                     method: 'POST',
+                    //credentials is needed to get the cookie back in the browser
+                    credentials: 'include',
                     headers: {
                         "Accept": "application/json", 
                         "Content-Type": "application/json"
@@ -51,7 +53,9 @@ export default {
                 //res is a promise, and on this iteration, if you don't use twice .then(), result.id is undefined because res will be pending
                 .then(res => res.json())
                 .then(result => {
+                    console.log('result: ', result);
                     const userId = result.id;
+                    console.log('userId: ', userId);
                     if(userId) {
                         localStorage.setItem('currentUserId', userId);
 

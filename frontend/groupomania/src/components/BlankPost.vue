@@ -39,6 +39,7 @@ export default {
     },
     methods: {
         textPostChosen() {
+            console.log('textPost Chosen');
             this.textIsChecked = true;
             this.imageIsChecked = false;
             this.files = null;
@@ -46,19 +47,23 @@ export default {
             this.imageAlt = null;
         },
         imagePostChosen() {
+            console.log('imagePostChosen');
             this.textIsChecked = false;
             this.imageIsChecked = true;
             this.modelTextPost = null;
         },
         addFile() {
+            console.log('addFile');
             const input = document.getElementById('imagePost');
             this.files = input.files;
         },
         getCurrentDate() {
+            console.log('getCurrentDate');
             const date = new Date(Date.now());
             return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
         },
         publishPost() {
+            console.log('publishPost');
             const newPost = {
                 title: this.modelTitle,
                 user_id: parseInt(localStorage.getItem('currentUserId'), 10),
@@ -67,19 +72,57 @@ export default {
                 imageAlt: this.imageAlt,
                 date: this.getCurrentDate()
             };
-            fetch('http://localhost:3000/api/posts', {
-                method: 'POST',
-                headers: {
-                    "Accept": "application/json", 
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(newPost)
-            })
-            .then(() => {
-                alert('La publication a bien été enregistrée');
-                this.$router.push('Posts');
-            })
-            .catch(err => console.log('Error publishPost', err));
+            console.log('pre fetch publishPost');
+            if(this.files) {
+                console.log('files existant');
+                console.log('this files: ', this.files);
+                const input = document.getElementById('imagePost');
+                const data = new FormData();
+                data.append('file', input.files[0]);
+                console.log('data: ', data);
+                fetch('http://localhost:3000/api/posts', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        //"Accept": "application/json"
+                    },
+                    body: data
+                    //file: data
+                })
+                .then(res => {console.log('première res fetch');res.json()})
+                .then(result => {
+                    console.log('deuxième res fetch');
+                    console.log('result fetch: ', result);
+                    if(!result) {
+                        alert('Une erreur s\'est produite');
+                    } else {
+                        alert('La publication a bien été enregistrée');
+                        this.$router.push('Posts');
+                    }
+                })
+            } else {
+                console.log('files non existant');
+                fetch('http://localhost:3000/api/posts', {
+                    method: 'POST',
+                    headers: {
+                        "Accept": "application/json", 
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(newPost)
+                })
+                .then(res => {console.log('première res fetch');res.json()})
+                .then(result => {
+                    console.log('deuxième res fetch');
+                    console.log('result fetch: ', result);
+                    if(!result) {
+                        alert('Une erreur s\'est produite');
+                    } else {
+                        alert('La publication a bien été enregistrée');
+                        this.$router.push('Posts');
+                    }
+                })
+                .catch(err => console.log('Error publishPost', err));
+            }
         }
     }
 }

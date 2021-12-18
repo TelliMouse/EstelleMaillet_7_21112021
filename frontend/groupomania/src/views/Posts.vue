@@ -37,7 +37,7 @@ export default {
     },
     data() {
         return {
-            postList : this.getPostList()
+            postList : ''//this.getPostList()
         }
     },
     methods: {
@@ -52,16 +52,18 @@ export default {
             .catch(err => console.log('Error getUserName', err));
         },
         getDate(date) {
-            //"YYYY-MM-DD HH:MM:SS"
-            const firstSplit = date.split('-');
-            const year = firstSplit[0];
-            const monthNum = firstSplit('-')[1];
-            const secondSplit = firstSplit[2].split(' ');
-            const day = secondSplit[0];
-            const thirdSplit = secondSplit[1].split(':');
-            const hour = thirdSplit[0];
-            const minutes = thirdSplit[1];
-            const seconds = thirdSplit[2];
+            //"yyyy-mm-ddThh:mm:ss.000Z"
+            console.log('date: ', date);
+            const firstSplit = date.split('-'); //['yyyy', 'mm', 'ddThh:mm:ss.000Z']
+            const year = firstSplit[0]; // 'yyyy'
+            const monthNum = firstSplit[1]; //'mm'
+            const secondSplit = firstSplit[2].split('T'); // ['dd', 'hh:mm:ss.000Z']
+            const day = secondSplit[0]; // 'dd'
+            const thirdSplit = secondSplit[1].split(':'); // ['hh', 'mm', 'ss.000Z']
+            const hour = thirdSplit[0]; // 'hh'
+            const minutes = thirdSplit[1]; // 'mm'
+            const fourthSplit = thirdSplit[2].split('.'); // ['ss', '000Z']
+            const seconds = fourthSplit[0]; // 'ss'
 
             const months = {
                 '01': "Janvier",
@@ -93,26 +95,33 @@ export default {
             }
         },
         getPostList() {
-            fetch('http://localhost:3000/api/posts/desc')
-            .then(res => {
-                const result = JSON.parse(res.json());
-                let postList;
+            fetch('http://localhost:3000/api/posts/order/desc')
+            .then(res => res.json())
+            .then(result => {
+                let postList = [];
                 const currentPage = this.getCurrentPage();
-                const majPostIndex = currentPage*10;   
+                const majPostIndex = currentPage*10;
                 const minPostIndex = majPostIndex - 10;
                 
                 for(let i = minPostIndex; i < majPostIndex && result[i]; i++) {
                     postList.push(result[i]);
                 }
 
-                return postList;
+                this.postList = postList;
+                //return postList;
             })
             .catch(err => console.log('Error getPostList', err));
         },
         getLinkToPost(postId) {
             return `/post?id=${postId}`;
         }
-    }
+    },
+    //beforeMount() {
+      //  this.getPostList();
+    //}
+    //mounted() {
+      //  console.log(this.postList);
+   // }
 }
 </script>
 

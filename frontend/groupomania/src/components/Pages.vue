@@ -5,17 +5,17 @@
                 <img src="../assets/fast-backward-solid.svg" alt="Icone double flèche vers la gauche" />
                 <p>Première page</p>
             </router-link>
-            <router-link to="{{ previousPageLink }}">
+            <router-link :to="previousPageLink">
                 <img src="../assets/arrow-circle-left-solid.svg" alt="Icone de flèche vers la gauche"/>
                 <p>Page précèdente</p>
             </router-link>
         </div>
         <div  v-if="isThereANextPage">
-            <router-link to="{{ nextPageLink }}">
+            <router-link :to="nextPageLink">
                 <img src="../assets/arrow-circle-right-solid.svg" alt="Icone de flèche vers la droite"/>
                 <p>Page suivante</p>
             </router-link>
-            <router-link to="{{ lastPageLink }}">
+            <router-link :to="lastPageLink">
                 <img src="../assets/fast-forward-solid.svg" alt="Icon double flèche vers la droite" />
                 <p>Dernière page</p>
             </router-link>
@@ -24,8 +24,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
 export default {
     name: 'Pages',
     data() {
@@ -36,10 +34,26 @@ export default {
             lastPageLink: this.getLastPageLink()
         }
     },
-    computed: {
-        ...mapState(['numberOfPages'])
-    },
     methods: {
+        getNumberOfPosts() {
+            fetch('http://localhost:3000/api/posts')
+            .then(res => res.json())
+            .then(result => {
+            const parsedResult = JSON.parse(result);
+            return parsedResult.length;
+            })
+            .catch(err => console.log('Error getNumberOfPosts', err));
+        },
+        getNumberOfPages() {
+            const post = this.numberOfPosts;
+            const modulo = post%10;
+            if(modulo === 0) {
+                return post/10;
+            } else {
+                const majPost = post + 10 - modulo
+                return majPost/10;
+            }
+        },
         getCurrentPage() {
             const url = window.location.href;
             const urlParams = new URLSearchParams(url);
@@ -50,31 +64,33 @@ export default {
                 return parseInt(urlParams.get('page'), 10);
             }
         },
-        getPreviousPageLink() {
-            const param = this.currentPage - 1;
-            return `/posts?page=${param}`;
-        },
-        getNextPageLink() {
-            const param = this.currentPage + 1;
-            return `/posts?page=${param}`;
-        }   ,
-        getLastPageLink() {
-            const param = this.numberOfPages;
-            return `/posts?page=${param}`;
-        },
         isThereAPreviousPage() {
-            if(this.currentPage > 1) {
+            if(this.getCurrentPage() > 1) {
                 return true;
             } else {
                 return false;
             }
         },
         isThereANextPage() {
-            if(this.currentPage < this.numberOfPages) {
+            if(this.getCurrentPage() < this.getNumberOfPages()) {
                 return true;
             } else {
                 return false;
             }
+        },
+        getPreviousPageLink() {
+            //const param = parseInt(this.currentPage, 10) - 1;
+            const param = this.getCurrentPage() - 1;
+            return `/posts?page=${param}`;
+        },
+        getNextPageLink() {
+            //const param = this.currentPage + 1;
+            const param = this.getCurrentPage() + 1;
+            return `/posts?page=${param}`;
+        }   ,
+        getLastPageLink() {
+            const param = this.getNumberOfPages();
+            return `/posts?page=${param}`;
         }
     }
 }

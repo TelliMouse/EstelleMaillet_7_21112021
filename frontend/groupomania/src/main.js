@@ -1,4 +1,4 @@
-import Vue from 'vue'
+//import Vue from 'vue'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -11,7 +11,7 @@ library.add(faUserSecret)
 
 createApp().use(store).component('font-awesome-icon', FontAwesomeIcon)
 
-Vue.forceUpdate();
+//Vue.forceUpdate();
 
 createApp().use(store).config.productionTip = false
 

@@ -86,6 +86,8 @@ export default {
         login(user) {
             fetch('http://localhost:3000/api/users/login', {
                 method: 'POST',
+                //credentials is needed to get the cookie back in the browser
+                credentials: 'include',
                 headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
