@@ -2,13 +2,11 @@ const Post = require('../models/Post');
 const sql = require('../db');
 const fs = require('fs');
 
-//il y aura le middleware multer avant, du coup, si y'a un file, le body est en JSON
-//marche sans req.file
+//Create post, retrieve request body and set likes and dislikes, if there is a file attached, it went through the multer middleware, so we can set the imageUrl
 exports.createPost = (req, res, next) => {
-    console.log('createPost');
     if(req.file) {
-        console.log('file existant');
-        const postObject = JSON.parse(req.body);
+        //When there is a file, the request body looks like: body: formData.append('image', image-file), .append('json', json-of-an-object)
+        const postObject = JSON.parse(req.body.json);
         const post = {
             ...postObject,
             imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
@@ -17,14 +15,11 @@ exports.createPost = (req, res, next) => {
             usersLike: '[]', //set as a string of an empty that will be parsed and stringified when manipulated 
             usersDislike: '[]'
         }
-        console.log('pre sql file');
         sql.query('INSERT INTO post SET ?', post, (error, result) => {
             if(error) {console.log('error req file sql', error); return res.status(400).json({ error })};
             return res.status(201).json({message: 'Post created!'});
         });
-        console.log('post sql file');
     } else {
-        console.log('no file');
         const post = {
             ...req.body,
             likes: 0,
@@ -32,16 +27,15 @@ exports.createPost = (req, res, next) => {
             usersLike: '[]',
             usersDislike: '[]'
         }
-        console.log('pre sql no file');
         sql.query('INSERT INTO post SET ?', post, (error, result) => {
             if(error) return res.status(400).json({ error });
             return res.status(201).json({message: 'Post created!'});
         });
-        console.log('post sql no file');
     }
 };
 
-//validé sans req.file Postman
+//Should work ¯\_(ツ)_/¯
+//Modify post, retrieve new values from request and replace the old ones, if there is a file attached, it went through the multer middleware, so we can set the new imageUrl
 exports.modifyPost = (req, res, next) => {
     if(req.file) {
         sql.query(`SELECT * FROM post WHERE id = ${req.params.id}`, (error, result) => {
@@ -49,7 +43,8 @@ exports.modifyPost = (req, res, next) => {
             const filename = result[0].imageUrl.split('/images/')[1];
             fs.unlink(`images/${filename}`, () => {
                 const postObject = {
-                    ...JSON.parse(req.body.post),
+                    //When there is a file, the request body looks like: body: formData.append('image', image-file), .append('json', json-of-an-object)
+                    ...JSON.parse(req.body.json),
                     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
                 }
                 sql.query(`UPDATE post SET ? WHERE id = ${req.params.id}`, postObject, (error, result) => {
@@ -67,7 +62,7 @@ exports.modifyPost = (req, res, next) => {
     }
 };
 
-//validé sans req.file Postman
+//Delete post from database, and when there is a file linked to the post, it is deleted from the related directory with fs.unlink
 exports.deletePost = (req, res, next) => {
     sql.query(`SELECT * FROM post WHERE id = ${req.params.id}`, (error, result) => {
         if(error) res.status(500).json({ error });
@@ -90,22 +85,19 @@ exports.deletePost = (req, res, next) => {
 };
 
 
-//validé Postman
+//Update the post in the database to increase or decrease the count of like/dislike and modify the array of user ID which liked/disliked the post
 exports.likePost = (req, res, next) => {
     sql.query(`SELECT * FROM post WHERE id = ${req.params.id}`, (error, result) => {
         if(error) res.status(400).json({ error });
-        
-        console.log('début contr likepost');
 
         let likesList = [];
         let dislikesList = [];
         
-        //usersLiked is stored as an array stringified
+        //usersLike and usersDislike are stored as an array stringified
         const likesListString = JSON.parse(result[0].usersLike);
         const dislikesListString = JSON.parse(result[0].usersDislike);
 
-        console.log('set lists');
-
+        //Both if conditions allows to keep likesList and dislikesList set as arrays, so we can use .push later
         if(likesListString != '[]') {
             for(let id of likesListString) {
                 likesList.push(id);
@@ -117,10 +109,11 @@ exports.likePost = (req, res, next) => {
                 dislikesList.push(id);
             }
         }
-        console.log('listify lists');
-        console.log('likelist: ', likesList);
-        console.log('dislikeslist: ', dislikesList);
 
+        /**
+         * Verify if the user has liked or disliked the post, or not
+         * @returns {Boolean | String(as a truthy value)}
+         */
         const hasTheUserAlreadyLikedOrDisliked = () => {
             
             if(likesList == '[]' || dislikesList == '[]') {
@@ -148,6 +141,8 @@ exports.likePost = (req, res, next) => {
             return false;
         };
 
+        //req.body.like can be 1 (when user likes), -1(when they dislike), or 0(when they delete their like/dislike)
+        //If the user liked and hasn't already liked or disliked, we update the number of likes, and the array of user ID which liked
         if(req.body.like === '1' && !hasTheUserAlreadyLikedOrDisliked()) {
             console.log('condition 1');
             likesList.push(req.body.user_id);
@@ -160,6 +155,7 @@ exports.likePost = (req, res, next) => {
                 if(error) res.status(400).json({ error });
                 res.status(200).json({message: 'Post successfully liked!'});
             })
+         //If the user disliked and hasn't already liked or disliked, we update the number of dislikes, and the array of user ID which disliked
         } else if(req.body.like === '-1' && !hasTheUserAlreadyLikedOrDisliked()) {
             console.log('condition 2');
             dislikesList.push(req.body.user_id);
@@ -172,6 +168,7 @@ exports.likePost = (req, res, next) => {
                 if(error) res.status(400).json({ error });
                 res.status(200).json({message: 'Post successfully disliked!'});
             })
+        //If the user resets their like/dislike and has already liked, we update the number of likes, and the array of user ID which liked
         } else if(req.body.like === '0' & hasTheUserAlreadyLikedOrDisliked() === 'likes') {
             console.log('condition 3');
             const index = likesList.indexOf(req.body.user_id);
@@ -185,6 +182,7 @@ exports.likePost = (req, res, next) => {
                 if(error) res.status(400).json({ error });
                 res.status(200).json({message: 'Post successfully unliked!'});
             })
+        //If the user resets their like/dislike and has already disliked, we update the number of dislikes, and the array of user ID which disliked
         } else if(req.body.like === '0' && hasTheUserAlreadyLikedOrDisliked() === 'dislikes') {
             console.log('condition 4');
             const index = dislikesList.indexOf(req.body.user_id);
@@ -204,7 +202,7 @@ exports.likePost = (req, res, next) => {
     })
 };
 
-//validé Postman
+//Return a specific post from its ID
 exports.getOnePost = (req, res, next) => {
     sql.query(`SELECT * FROM post WHERE id = ${req.params.id}`, (error, result) => {
         if(error) res.status(404).json({ error });
@@ -212,7 +210,7 @@ exports.getOnePost = (req, res, next) => {
     })
 };
 
-//validé Postman
+//Return all posts in descending order
 exports.getAllPosts = (req, res, next) => {
     sql.query('SELECT * FROM post ORDER BY date DESC', (error, result) => {
         if(error) return res.status(400).json({ error });
@@ -220,7 +218,7 @@ exports.getAllPosts = (req, res, next) => {
     })
 };
 
-//validé Postman
+//Return all comments in ascending order from a specific post from its id
 exports.getAllCommentsFromPost = (req, res, next) => {
     //select * from comment where post_id = req.params.id
     sql.query(`SELECT * FROM comment WHERE post_id = ${req.params.id} ORDER BY date ASC`, (error, result) => {

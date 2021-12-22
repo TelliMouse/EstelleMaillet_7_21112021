@@ -38,32 +38,42 @@ export default {
         }
     },
     methods: {
+        /**
+         * Set unecessary caracteristics to null
+         */
         textPostChosen() {
-            console.log('textPost Chosen');
             this.textIsChecked = true;
             this.imageIsChecked = false;
             this.files = null;
             this.imageUrl = null;
             this.imageAlt = null;
         },
+        /**
+         * Set unecessary caracteristics to null
+         */
         imagePostChosen() {
-            console.log('imagePostChosen');
             this.textIsChecked = false;
             this.imageIsChecked = true;
             this.modelTextPost = null;
         },
+        /**
+         * Assign the input's files to files, so it can return a truthy value, or null
+         */
         addFile() {
-            console.log('addFile');
             const input = document.getElementById('imagePost');
             this.files = input.files;
         },
+        /**
+         * Rewrite the current date to match the format 'YYYY-MM-DD HH:MM:SS' of MySQL
+         */
         getCurrentDate() {
-            console.log('getCurrentDate');
             const date = new Date(Date.now());
             return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
         },
+        /**
+         * Retrieve post's values to create a post through the API, then, if successfull, redirects to the main page
+         */
         publishPost() {
-            console.log('publishPost');
             const newPost = {
                 title: this.modelTitle,
                 user_id: parseInt(localStorage.getItem('currentUserId'), 10),
@@ -72,27 +82,20 @@ export default {
                 imageAlt: this.imageAlt,
                 date: this.getCurrentDate()
             };
-            console.log('pre fetch publishPost');
             if(this.files) {
-                console.log('files existant');
-                console.log('this files: ', this.files);
                 const input = document.getElementById('imagePost');
                 const data = new FormData();
-                data.append('file', input.files[0]);
-                console.log('data: ', data);
+                data.append('image', input.files[0]);
+                data.append('json', JSON.stringify(newPost));
                 fetch('http://localhost:3000/api/posts', {
                     method: 'POST',
                     headers: {
-                        "Content-Type": "multipart/form-data",
-                        //"Accept": "application/json"
+                        "Accept": "application/json"
                     },
                     body: data
-                    //file: data
                 })
-                .then(res => {console.log('première res fetch');res.json()})
-                .then(result => {
-                    console.log('deuxième res fetch');
-                    console.log('result fetch: ', result);
+                .then(res => {
+                    const result = res.json();
                     if(!result) {
                         alert('Une erreur s\'est produite');
                     } else {
@@ -101,7 +104,6 @@ export default {
                     }
                 })
             } else {
-                console.log('files non existant');
                 fetch('http://localhost:3000/api/posts', {
                     method: 'POST',
                     headers: {
@@ -110,10 +112,8 @@ export default {
                     },
                     body: JSON.stringify(newPost)
                 })
-                .then(res => {console.log('première res fetch');res.json()})
+                .then(res => res.json())
                 .then(result => {
-                    console.log('deuxième res fetch');
-                    console.log('result fetch: ', result);
                     if(!result) {
                         alert('Une erreur s\'est produite');
                     } else {

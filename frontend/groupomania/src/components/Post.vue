@@ -1,11 +1,11 @@
 <template>
-    <div>
+    <div class="published-post">
         <h1 v-if="!modifyClicked">{{ postTitle }}</h1>
         <input v-if="modifyClicked" type="text" id="changeTitle" v-model="modelTitle"/>
 
         <h2>{{ userName }}</h2>
 
-        <p v-if="textPost && !modifyClicked">{{ post }}</p>
+        <p class="post-text" v-if="textPost && !modifyClicked">{{ post }}</p>
         <textarea v-if="textPost && modifyClicked" name="textarea" rows="5" cols="30" v-model="modelPost"></textarea>
 
         <img v-if="imagePost && !modifyClicked" src="{{ imageUrl }}" alt="{{ imageAlt }}"/>
@@ -27,7 +27,6 @@
         <div>
             <button v-if="modConditions" @click="modifyButton">Modifier</button>
             <button v-if="modConditions || modConditionsAndAdmin" @click="deletePost">Supprimer</button>
-            <input/>
         </div>
         <router-link to="{{ linkToPost }}" v-if="needLinkToPost">Voir la publication</router-link>
     </div>
@@ -205,18 +204,25 @@ export default {
                 imageAlt: this.imageAlt
             };
             if(this.files) {
+                const input = document.getElementById('changeImagePost');
+                const data = new FormData();
+                data.append('image', input.files[0]);
+                data.append('json', JSON.stringify(modifiedPost));
                 fetch(`http://localhost:3000/api/posts/${this.postId}`, {
                     method: 'PUT',
                     headers: {
-                    "Accept": "application/json", 
-                    "Content-Type": "application/json"
+                    "Accept": "application/json",
                     },
-                    body: JSON.stringify({post: modifiedPost}),
-                    file: this.files
+                    body: data
                 })
-                .then(() => {
-                    alert('La publication a bien été modifiée!')
-                    this.$forceUpdate();
+                .then(res => res.json())
+                .then(result => {
+                    if(!result) {
+                        alert('Une erreur s\'est produite');
+                    } else {
+                        alert('La publication a bien été modifiée!')
+                        this.$forceUpdate();
+                    }
                 })
                 .catch(err => console.log('Error modifyPost', err))
             } else {
@@ -228,9 +234,14 @@ export default {
                     },
                     body: JSON.stringify(modifiedPost)
                 })
-                .then(() => {
-                    alert('La publication a bien été modifiée!')
-                    this.$forceUpdate();
+                .then(res => res.json())
+                .then(result => {
+                    if(!result) {
+                        alert('Une erreur s\'est produite');
+                    } else {
+                        alert('La publication a bien été modifiée!')
+                        this.$forceUpdate();
+                    }
                 })
                 .catch(err => console.log('Error modifyPost', err))
             }
@@ -239,10 +250,15 @@ export default {
             fetch(`http://localhost:3000/api/posts/${this.postId}`, {
                 method: 'DELETE'
             })
-            .then(() => {
-                alert('La publication a bien été supprimée.');
-                this.$forceUpdate();
-            })
+            .then(res => res.json())
+                .then(result => {
+                    if(!result) {
+                        alert('Une erreur s\'est produite');
+                    } else {
+                        alert('La publication a bien été supprimée!')
+                        this.$forceUpdate();
+                    }
+                })
             .catch(err => console.log('Error deletePost', err));
         },
         modConditions() {
@@ -270,6 +286,29 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+div.published-post {
+    background-color: #BBC8CA;
+    border-radius: 15px/15px;
+    margin-bottom: 2em;
+    padding: 1em 0.75em 1.5em 0.75em;
+    width: 70%;
+    &>h1 {
+        margin-top: 0;
+        size: 2em;
+    }
+    &>p.post-text {
+        background-color: white;
+        border: #3F826D solid 2px;
+        width: 90%;
+        white-space: pre-wrap;
+        padding: 0.75em 0.5em;
+        align-self: center;
+    }
+    &>h2 {
+        color: #3F826D;
+    }
+}
+
 
 </style>
