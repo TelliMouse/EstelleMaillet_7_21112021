@@ -3,6 +3,7 @@
         <div v-if="isThereAPreviousPage">
             <router-link to="/posts">
                 <img src="../assets/fast-backward-solid.svg" alt="Icone double flèche vers la gauche" />
+                <!--<fa icon="coffee" />-->
                 <p>Première page</p>
             </router-link>
             <router-link :to="previousPageLink">

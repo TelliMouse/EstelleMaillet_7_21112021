@@ -11,8 +11,6 @@ GET     /api/posts/:id          {}
         res                     {toutes les charactéristiques du post}
 GET     /api/posts              {}
         res                     {array de tous les objets Post}
-GET     /api/posts/desc         {}
-        res                     {tous les posts en ordre descendant aka du plus récent au moins récent}
 PUT     /api/posts/:id          {soit comme pour GET avec les champs à modifier, soit image: file et post: JSON}
 POST    /api/posts/:id/like     {user_id: Integer, like: 1, -1 ou 0}
 GET     /api/posts/:id/comments {}     

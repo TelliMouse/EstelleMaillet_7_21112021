@@ -37,7 +37,7 @@ exports.login = (req, res, next) => {
                         process.env.TOKEN_SECRET,
                         {expiresIn: '24h'}
                     )
-                    return res.cookie('jwt', token, { maxAge: 86400, httpOnly: true }).status(200).json({ id : result[0].id });
+                    return res.cookie('jwt', token, { maxAge: 86400 * 1000, httpOnly: true }).status(200).json({ id : result[0].id });
                 }
                 //The jwt token stores the user_id of the user that has been authentified
                 const decodedToken = jwt.verify(cookieJWT, process.env.TOKEN_SECRET);
@@ -51,9 +51,9 @@ exports.login = (req, res, next) => {
                         process.env.TOKEN_SECRET,
                         {expiresIn: '24h'}
                     )
-                    return res.cookie('jwt', token, { maxAge: 86400, httpOnly: true }).status(200).json({ id: result[0].id });
+                    return res.cookie('jwt', token, { maxAge: 86400 * 1000, httpOnly: true }).status(200).json({ id: result[0].id });
                 } else {
-                    return res.status(200).json(result[0].id);
+                    return res.status(200).json({ id: result[0].id });
                 }
             })
             .catch(error => res.status(500).json({ error }));
@@ -61,6 +61,7 @@ exports.login = (req, res, next) => {
     })
 };
 
+//validé Postman
 exports.getUserById = (req, res, next) => {
     console.log('début contr getUserById');
     sql.query(`SELECT * FROM user WHERE id = ${req.params.id}`, (error, result) => {
@@ -70,6 +71,7 @@ exports.getUserById = (req, res, next) => {
     })
 };
 
+//validé Postman
 exports.getAllUsers = (req, res, next) => {
     console.log('début contr getAllUsers');
     sql.query('SELECT * FROM user', (error, result) => {

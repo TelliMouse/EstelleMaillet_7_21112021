@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="view-Post">
         <HeaderPost />
         <Post 
             postTile="{{ post.title }}"
@@ -20,7 +20,7 @@
         <BlankComment 
             postId="{{ post.id }}"
             userName="{{ getUserName(parseInt(localStorage.getItem('currentUserId'), 10)) }}"
-            @new-comment-publisehd="reloadPage"/>
+            @new-comment-publisehd="addNewComment"/>
         <PublishedComment 
             v-for="comment in commentList"
             :key="comment.id"
@@ -118,13 +118,18 @@ export default {
             })
             .catch(err => console.log('Error getComments', err));
         },
-        reloadPage() {
-            this.$forceUpdate();
+        //reloadPage() {
+        //    this.$forceUpdate();
+        //}
+        addNewComment(payload) {
+            this.commentList.push(payload);
         }
     }
 }
 </script>
 
 <style>
-
+div.view-Post {
+    display: flex;
+}
 </style>

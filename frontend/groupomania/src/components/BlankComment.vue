@@ -40,7 +40,12 @@ export default {
             })
             .then(() => {
                 alert('Votre commentaire a été publié.');
-                this.$emit('new-comment-published');
+                this.$emit('new-comment-published', {
+                    user_id: currentUserId,
+                    post_id: this.postId,
+                    text: this.comment,
+                    date: commentDate
+                });
             })
             .catch(err => console.log('Error publishComment', err));
         }

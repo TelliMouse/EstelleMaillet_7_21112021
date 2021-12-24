@@ -1,10 +1,11 @@
 <template>
-    <div>
+    <div class="view-Post">
+        <fa icon="coffee" />
         <Post
         v-for="post in postList"
         :key="post.id"
         :postTitle="post.title"
-        :postTextPost="post.text"
+        :postTextPost="isThereText(post.text)"
         :userName="post.userName"
         :post="post.text"
         :imageUrl="null"
@@ -32,6 +33,7 @@ export default {
     },
     data() {
         return {
+            name: '',
             post: 'Ceci est un test',
             postList: [
                 {
@@ -65,11 +67,40 @@ export default {
             };
 
             this.postList.push(post3);
-        }
-    }
+        },
+        isThereText(text) {
+            if(text) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        getUserName(userId) {
+            console.log('getUserName');
+            fetch(`http://localhost:3000/api/users/${userId}`)
+            .then(res => res.json())
+            .then(result => {
+                console.log('user nam result: ', result);
+                const firstname = result.firstname;
+                console.log('firstname: ', firstname);
+                const lastname = result.lastname;
+                console.log('lastname: ', lastname);
+                const name = `${firstname} ${lastname}`
+                return name;
+            })
+            .catch(err => console.log('Error getUserName', err));
+        },
+    },
+    //created() {
+    //    this.name = this.getUserName(2);
+    //}
 }
 </script>
 
 <style>
-
+div.view-Post {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 </style>
