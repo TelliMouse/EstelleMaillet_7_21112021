@@ -1,15 +1,12 @@
-//import Vue from 'vue'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { fas } from '@fortawesome/free-solid-svg-icons'
+import { faArrowCircleLeft, faArrowCircleRight, faFastBackward, faFastForward, faHome, faPlusCircle, faSignInAlt, faSignOutAlt, faThumbsDown, faThumbsUp, faUserPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import store from './store'
 
-library.add(fas);
-
-//Vue.forceUpdate();
+library.add(faArrowCircleLeft, faArrowCircleRight, faFastBackward, faFastForward, faHome, faPlusCircle, faSignInAlt, faSignOutAlt, faThumbsDown, faThumbsUp, faUserPlus);
 
 createApp(App).config.productionTip = false
 
@@ -18,9 +15,3 @@ createApp(App)
     .use(router)
     .component('fa', FontAwesomeIcon)
     .mount('#app')
-
-/*new Vue({
-    el: '#app',
-    components: { App },
-    template: '<App/>' 
-})*/

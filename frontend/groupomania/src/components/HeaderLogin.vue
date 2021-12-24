@@ -29,8 +29,9 @@ header {
     justify-content: space-between;
     height: 7em;
     padding-left: 0.5em;
+    width: 100%;
     &>img {
-        max-width: 15em;
+        max-width: 12em;
     }
     &>nav {
         width: 35%;

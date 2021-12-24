@@ -1,6 +1,7 @@
 <template>
     <header>
-        <img src="../assets/icon-left-font-monochrome-black.png" />
+        <img class="desktop" src="../assets/icon-above-font-removebg-preview.png" />
+        <img class="phone" src="../assets/icon-removebg-preview.png" />
         <nav>
             <router-link to="/posts">
                 <fa icon="home"/>

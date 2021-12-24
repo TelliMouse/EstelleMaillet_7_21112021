@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="login">
         <HeaderLogin/>
         <FormLogin />
     </div>
@@ -18,5 +18,10 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+div.login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 </style>

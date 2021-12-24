@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="form-login">
         <h1>Ravi de vous revoir!</h1>
         <label for="email">Email:</label>
         <input v-model="email" type="email" name="email">
@@ -74,5 +74,45 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+div.form-login {
+    display: flex;
+    flex-direction: column;
+    background-color: #FFD7D7;
+    width: 85%;
+    margin-top: 2em;
+    border-radius: 15px/15px;
+    padding-left: 0.75em;
+    padding-right: 00.75em;
+    padding-bottom: 1em;
+    &>h1 {
+        align-self: center;
+    }
+    &>label {
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+    }
+    &>input {
+        border-radius: 15px/15px;
+        border: 2px solid #002626;
+    }
+    &>button {
+        margin-top: 1em;
+        width: 20%;
+        align-self: center;
+        color: white;
+        background-color: #002626;
+        border-radius: 15px/15px;
+        border: none;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+        box-shadow: 2px 2px 3px #0E4749;
+    }
+    &>a {
+        text-decoration: none;
+        color: #002626;
+        align-self: center;
+        margin-top: 1em;
+    }
+}
 </style>
