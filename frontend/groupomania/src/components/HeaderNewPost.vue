@@ -3,11 +3,11 @@
         <img src="../assets/icon-left-font-monochrome-black.png" />
         <nav>
             <router-link to="/posts">
-                <img class="icon" src="../assets/home-solid.svg"/>
+                <fa icon="home"/>
                 <p>Acceuil</p>
             </router-link>
             <router-link to="/login" @click="wipeLocalStorage">
-                <img class="icon" src="../assets/sign-out-alt-solid.svg"/>
+                <fa icon="sign-out-alt"/>
                 <p>Quitter</p>
             </router-link>
         </nav>

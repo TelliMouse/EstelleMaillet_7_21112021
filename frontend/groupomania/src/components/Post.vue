@@ -8,7 +8,7 @@
         <p class="post-text" v-if="textPost && !modifyClicked">{{ post }}</p>
         <textarea v-if="textPost && modifyClicked" name="textarea" rows="5" cols="30" v-model="modelPost"></textarea>
 
-        <img v-if="imagePost && !modifyClicked" src="{{ imageUrl }}" alt="{{ imageAlt }}"/>
+        <img v-if="imagePost && !modifyClicked" :src="imageUrl" :alt="imageAlt"/>
 
         <label v-if="imagePost && modifyClicked" for="changeImagePost">Si vous souhaitez changer votre image, choisissez un nouveau fichier:</label>
         <input v-if="imagePost && modifyClicked" @input="addFile" type="file" name="image" id="changeImagePost" accept="image/jpg, image/jpeg, image/png, image/gif, image/bmp, image/webp, image/svg+xml"/>
@@ -17,8 +17,8 @@
         <p v-if="imagePost && modifyClicked">Avoir des textes alternatifs pour vos images permet d'avoir un contenu plus accessible pour les personnes malvoyantes</p>
         <div>
             <div>
-                <button @click="likeClicked"><img v-if="liked" src="../assets/thumbs-up-solid.svg" alt="Icone de like"/><img v-if="!liked" src="../assets/thumbs-up-solid.svg" alt="Icone de like"/> {{ shownLikeNumber }}</button>
-                <button @click="dislikeClicked"><img v-if="disliked" src="../assets/thumbs-down-solid.svg" alt="Icon de dislike"/><img v-if="!disliked" src="../assets/thumbs-down-solid.svg" alt="Icon de dislike"/> {{ shownDislikeNumber }}</button>
+                <button @click="likeClicked"><fa icon="thumbs-up" v-if="liked" alt="Icone de like"/><fa icon="thumbs-up" v-if="!liked" alt="Icone de like"/> {{ shownLikeNumber }}</button>
+                <button @click="dislikeClicked"><fa icon="thumbs-down" v-if="disliked" alt="Icone de dislike"/><fa icon="thumbs-down" v-if="!disliked" alt="Icone de dislike"/> {{ shownDislikeNumber }}</button>
             </div>
             <p>{{ date }}</p>
         </div>
@@ -307,6 +307,10 @@ div.published-post {
     }
     &>h2 {
         color: #3F826D;
+    }
+    &>img {
+        width: 95%;
+        border: #3F826D solid 3px;
     }
 }
 

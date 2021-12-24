@@ -2,22 +2,21 @@
     <div>
         <div v-if="isThereAPreviousPage">
             <router-link to="/posts">
-                <img src="../assets/fast-backward-solid.svg" alt="Icone double flèche vers la gauche" />
-                <!--<fa icon="coffee" />-->
+                <fa icon="fast-backward" alt="Icone double flèche vers la gauche" />
                 <p>Première page</p>
             </router-link>
             <router-link :to="previousPageLink">
-                <img src="../assets/arrow-circle-left-solid.svg" alt="Icone de flèche vers la gauche"/>
+                <fa icon="arrow-circle-left" alt="Icone de flèche vers la gauche"/>
                 <p>Page précèdente</p>
             </router-link>
         </div>
         <div  v-if="isThereANextPage">
             <router-link :to="nextPageLink">
-                <img src="../assets/arrow-circle-right-solid.svg" alt="Icone de flèche vers la droite"/>
+                <fa icon="arrow-circle-right" alt="Icone de flèche vers la droite"/>
                 <p>Page suivante</p>
             </router-link>
             <router-link :to="lastPageLink">
-                <img src="../assets/fast-forward-solid.svg" alt="Icon double flèche vers la droite" />
+                <fa icon="fast-forward" alt="Icon double flèche vers la droite" />
                 <p>Dernière page</p>
             </router-link>
         </div>

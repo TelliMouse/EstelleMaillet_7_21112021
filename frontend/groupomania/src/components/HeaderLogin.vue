@@ -1,13 +1,14 @@
 <template>
     <header>
-        <img src="../assets/icon-left-font-monochrome-black.png" />
+        <img class="desktop" src="../assets/icon-above-font-removebg-preview.png" />
+        <img class="phone" src="../assets/icon-removebg-preview.png" />
         <nav>
             <router-link to="/login">
-                <img class="icon" src="../assets/sign-in-alt-solid.svg"/>
+                <fa icon="sign-in-alt"/>
                 <p>Se connecter</p>
             </router-link>
             <router-link to="/signup">
-                <img class="icon" src="../assets/user-plus-solid.svg"/>
+                <fa icon="user-plus"/>
                 <p>S'inscrire</p>
             </router-link>
         </nav>
@@ -15,39 +16,65 @@
 </template>
 
 <script>
-//import { library } from '@fortawesome/fontawesome-svg-core'
-//import { faUserPlus } from '@fortawesome/free-solid-svg-icons'
-
-//library.add(faUserPlus)
-
 export default {
     name: 'HeaderLogin'
 }
 </script>
 
-<style>
+<style lang="scss">
 header {
-    background-color: #BBC8CA;
+    background-color: #002626;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    height: 7em;
+    padding-left: 0.5em;
+    &>img {
+        max-width: 15em;
+    }
+    &>nav {
+        width: 35%;
+        justify-content: space-between;
+        &>a {
+            text-decoration: none;
+            color: #FFD7D7;
+        }
+    }
 }
 
-nav {
-    display: flex;
-    flex-direction: row;
+@media all and (max-width: 767px) { //phone
+    .desktop {
+        display: none;
+    }
+    nav {
+        display: flex;
+        flex-direction: column;
+        &>a {
+            display: flex;
+            flex-direction: row;
+            max-height: 50%;
+            justify-content: space-around;
+            &>svg {
+                margin-top: 1em;
+            }
+        }
+    }
 }
 
-img.icon {
-    height: 3em;
+@media all and (min-width: 768px) { //desktop + tablet
+    nav {
+        display: flex;
+        flex-direction: row;
+        &>a {
+            display: flex;
+            flex-direction: column;
+            width: 50%;
+            padding-top: 1.5em;
+            align-items: center;
+        }
+    }
+    .phone {
+        display: none;
+    }
 }
-
-router-link {
-    text-decoration: none;
-}
-
-/*font-awesome-icon {
-    height: 3em;
-    color: black;
-}*/
 </style>

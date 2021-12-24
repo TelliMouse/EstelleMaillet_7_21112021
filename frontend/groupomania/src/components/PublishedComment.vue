@@ -5,8 +5,8 @@
         <textarea v-if="modifyClicked" name="textarea" v-model="comment"></textarea>
         <div>
             <div>
-                <button @click="likeClicked"><img v-if="liked" src="../assets/thumbs-up-solid.svg" alt="Icone de like"/><img v-if="!liked" src="../assets/thumbs-up-solid.svg" alt="Icone de like"/> {{ shownLikeNumber }}</button>
-                <button @click="dislikeClicked"><img v-if="disliked" src="../assets/thumbs-down-solid.svg" alt="Icon de dislike"/><img v-if="!disliked" src="../assets/thumbs-down-solid.svg" alt="Icon de dislike"/> {{ shownDislikeNumber }}</button>
+                <button @click="likeClicked"><fa icon="thumbs-up" v-if="liked" alt="Icone de like"/><fa icon="thumbs-up" v-if="!liked" alt="Icone de like"/> {{ shownLikeNumber }}</button>
+                <button @click="dislikeClicked"><fa icon="thumbs-down" v-if="disliked" alt="Icone de dislike"/><fa icon="thumbs-down" v-if="!disliked" alt="Icone de dislike"/> {{ shownDislikeNumber }}</button>
             </div>
             <p>{{ date }}</p>
         </div>
