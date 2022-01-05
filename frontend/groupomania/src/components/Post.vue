@@ -15,20 +15,22 @@
         <label v-if="imagePost && modifyClicked" for="changeImageAlt">Si vous avez changé votre image, veuillez la décrire en quelques mots:</label>
         <input v-if="imagePost && modifyClicked" type="text" name="image" id="changeImageUrl" placeholder="Exemple: Photographie d'une colline verdoyante devant un ciel bleu sans nuage" v-model="modelImageAlt"/>
         <p v-if="imagePost && modifyClicked">Avoir des textes alternatifs pour vos images permet d'avoir un contenu plus accessible pour les personnes malvoyantes</p>
-        <div>
+        <div class="like-date">
             <div>
-                <button @click="likeClicked"><fa icon="thumbs-up" v-if="liked" alt="Icone de like"/><fa icon="thumbs-up" v-if="!liked" alt="Icone de like"/> {{ shownLikeNumber }}</button>
-                <button @click="dislikeClicked"><fa icon="thumbs-down" v-if="disliked" alt="Icone de dislike"/><fa icon="thumbs-down" v-if="!disliked" alt="Icone de dislike"/> {{ shownDislikeNumber }}</button>
+                <button @click="likeClicked" v-if="liked" class="liked"><fa icon="thumbs-up" alt="Icone de like"/>{{ shownLikeNumber }}</button>
+                <button @click="likeClicked" v-if="!liked" class="not-liked"><fa icon="thumbs-up" alt="Icone de like"/>{{ shownLikeNumber }}</button>
+                <button @click="dislikeClicked" v-if="disliked" class="liked"><fa icon="thumbs-down" alt="Icone de dislike"/>{{ shownDislikeNumber }}</button>
+                <button @click="dislikeClicked" v-if="!disliked" class="not-liked"><fa icon="thumbs-down" alt="Icone de dislike"/> {{ shownDislikeNumber }}</button>
             </div>
             <p>{{ date }}</p>
         </div>
         <p id="likeErrorMessage"></p>
         <button v-if="modifyClicked" @click="modifyPost">Publier</button>
-        <div>
+        <div class="modify-buttons">
             <button v-if="modConditions" @click="modifyButton">Modifier</button>
             <button v-if="modConditions || modConditionsAndAdmin" @click="deletePost">Supprimer</button>
         </div>
-        <router-link to="{{ linkToPost }}" v-if="needLinkToPost">Voir la publication</router-link>
+        <router-link :to="{ name: 'Post', params: { id: postId}}" v-if="needLinkToPost">Voir la publication</router-link>
     </div>
 </template>
 
@@ -49,7 +51,6 @@ export default {
         postModConditions: Boolean,
         postImagePost: Boolean,
         userId: Number, //id of the user who made the post
-        linkToPost: String,
         postNeedLinkToPost: Boolean
     },
     data() {
@@ -65,52 +66,113 @@ export default {
             disliked: this.isDisliked(),
             needLinkToPost: this.postNeedLinkToPost,
             shownLikeNumber: this.likeNumber,
-            shownDislikeNumber: this.dislikeNumber
+            shownDislikeNumber: this.dislikeNumber,
+            likeList: [], //this.getLikeList(),
+            dislikeList: [], //this.getDislikeList()
+            hasTheUser: this.hasTheUserAlreadyLiked()
         }
     },
     methods: {
-        hasTheUserAlreadyLiked() {
-            const currentUserId = localStorage.getItem('currentUserId');
-
+        /*getLikeList() {
+            console.log('getlikelist');
             fetch(`http://localhost:3000/api/posts/${this.postId}`)
-            .then(res => {
-                
-                const result = res.json();
-                const likeList = JSON.parse(result.usersLike);
-                const dislikeList = JSON.parse(result.usersDislike);
-
-                for(let userId of likeList) {
-                    if(currentUserId == userId) {
-                        return 'liked';
-                    }
-                }
-
-                for(let userId of dislikeList) {
-                    if(currentUserId == userId) {
-                        return 'disliked';
-                    }
-                }
-
-                return false;
+            .then(res => res.json())
+            .then(result => {
+                console.log('result getlikelist: ', result);
+                this.likeList = result[0].usersLike;
+                //console.log('result: ', result);
+                //console.log('likelist: ', this.likeList)
             })
             .catch(err => console.log('Error hasTheUserAlreadyLiked', err));
         },
+        getDislikeList() {
+            console.log('getdislikelist');
+            fetch(`http://localhost:3000/api/posts/${this.postId}`)
+            .then(res => res.json())
+            .then(result => {
+                this.dislikeList = result[0].usersDisike;
+                //console.log('dislikelist: ', this.dislikeList)
+            })
+            .catch(err => console.log('Error hasTheUserAlreadyLiked', err));
+        },*/
+        hasTheUserAlreadyLiked() {
+            console.log('hastheuseralreadyliked');
+            const currentUserId = localStorage.getItem('currentUserId');
+
+            //console.log('likelist: ', this.likeList);
+            //console.log('dislikelist: ', this.dislikeList);
+
+            /*if(this.likeList != []) {
+                for(let userId of this.likeList) {
+                    console.log('iteration hastheuserliked');
+                    if(currentUserId == userId) {
+                        console.log('hastheuser liked');
+                        return 'liked';
+                    }
+                }
+            }
+
+            if(this.dislikeList != []) {
+                for(let userId of this.dislikeList) {
+                    if(currentUserId == userId) {
+                        console.log('hastheuser disliked');
+                        return 'disliked';
+                    }
+                }
+            }
+
+            console.log('hastheuser: ', false);
+            return false;*/
+            fetch(`http://localhost:3000/api/posts/${this.postId}`)
+            .then(res => res.json())
+            .then(result => {
+                const likeList = result[0].usersLike;
+                const dislikeList = result[0].usersDislike;
+                if(likeList != []) {
+                    for(let userId of likeList) {
+                        console.log('iteration hastheuserliked');
+                        if(currentUserId == userId) {
+                            console.log('hastheuser liked');
+                            return this.hasTheUser = 'liked';
+                        }
+                    }
+                }
+
+                if(dislikeList != []) {
+                    for(let userId of dislikeList) {
+                        if(currentUserId == userId) {
+                            console.log('hastheuser disliked');
+                            return this.hasTheUser = 'disliked';
+                        }
+                    }
+                }
+
+                return this.hasTheUser = false
+            
+            })
+            .catch(error => console.log(error))
+        },
         isLiked() {
-            if(this.hasTheUserAlreadyLiked() === 'liked') {
+            console.log('isLiked');
+            if(this.hasTheUser === 'liked') {
                 return true;
             } else {
                 return false;
             }
         },
         isDisliked() {
-            if(this.hasTheUserAlreadyLiked() === 'disliked') {
+            console.log('isDisliked');
+            if(this.hasTheUser === 'disliked') {
                 return true;
             } else {
                 return false;
             }
         },
         likeClicked() {
-            if(this.hasTheUserAlreadyLiked() === false) {
+            console.log('likeClicked');
+            console.log('in likeclikcked hasthe user: ', this.hasTheUser);
+            if(this.hasTheUser === false) {
+                console.log('hastheuser false');
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
                     headers: {
@@ -122,12 +184,22 @@ export default {
                         like: 1
                     })
                 })
-                .then(() => {
-                    this.shownLikeNumber++;
-                    this.liked = true;
+                .then(res => res.json())
+                .then(result => {
+                    if(result == {message: 'The user cannot like/dislike the post'}) {
+                        const messagePlace = document.getElementById('likeErrorMessage');
+                        messagePlace.innerText = 'Vous ne pouvez pas liker cette publication.';
+                    } else {
+                        this.shownLikeNumber++;
+                        this.liked = true;
+                        this.hasTheUser = 'liked';
+                        const messagePlace = document.getElementById('likeErrorMessage');
+                        messagePlace.innerText = '';
+                    }
                 })
                 .catch(err => console.log('Error likeClicked', err));
-            } else if(this.hasTheUserAlreadyLiked() === 'liked') {
+            } else if(this.hasTheUser === 'liked') {
+                console.log('hastheuser liked');
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
                     headers: {
@@ -139,18 +211,30 @@ export default {
                         like: 0
                     })
                 })
-                .then(() => {
-                    this.shownLikeNumber--;
-                    this.liked = false;
+                .then(res => res.json())
+                .then(result => {
+                    if(result == {message: 'The user cannot like/dislike the post'}) {
+                        const messagePlace = document.getElementById('likeErrorMessage');
+                        messagePlace.innerText = 'Vous ne pouvez pas déliker cette publication.';
+                    } else {
+                        this.shownLikeNumber--;
+                        this.liked = false;
+                        this.hasTheUser = false;
+                        const messagePlace = document.getElementById('likeErrorMessage');
+                        messagePlace.innerText = '';
+                    }
                 })
                 .catch(err => console.log('Error likeClicked', err));
             } else {
+                console.log('else, error');
                 const messagePlace = document.getElementById('likeErrorMessage');
-                messagePlace.innerText = 'Vous ne pouvez pas liker cette publication.'
+                messagePlace.innerText = 'Vous ne pouvez pas liker cette publication.';
             }
         },
         dislikeClicked() {
-            if(this.hasTheUserAlreadyLiked() === false) {
+            console.log('dislikeclicked');
+            if(this.hasTheUser === false) {
+                console.log('hastheuser false');
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
                     headers: {
@@ -162,12 +246,22 @@ export default {
                         like: -1
                     })
                 })
-                .then(() => {
-                    this.shownDislikeNumber++;
-                    this.disliked = true;
+                .then(res => res.json())
+                .then(result => {
+                    if(result == {message: 'The user cannot like/dislike the post'}) {
+                        const messagePlace = document.getElementById('likeErrorMessage');
+                        messagePlace.innerText = 'Vous ne pouvez pas disliker cette publication.';
+                    } else {
+                        this.shownDislikeNumber++;
+                        this.disliked = true;
+                        this.hasTheUser = 'disliked';
+                        const messagePlace = document.getElementById('likeErrorMessage');
+                        messagePlace.innerText = '';
+                    }
                 })
                 .catch(err => console.log('Error dislikeClicked', err));
-            } else if(this.hasTheUserAlreadyLiked() === 'disliked') {
+            } else if(this.hasTheUser === 'disliked') {
+                console.log('hastheuser disliked');
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
                     headers: {
@@ -179,14 +273,24 @@ export default {
                         like: 0
                     })
                 })
-                .then(() => {
-                    this.shownDislikeNumber--;
-                    this.disliked = false;
+                .then(res => res.json())
+                .then(result => {
+                    if(result == {message: 'The user cannot like/dislike the post'}) {
+                        const messagePlace = document.getElementById('likeErrorMessage');
+                        messagePlace.innerText = 'Vous ne pouvez pas dédisliker cette publication.';
+                    } else {
+                        this.shownDislikeNumber--;
+                        this.disliked = false;
+                        this.hasTheUser = false;
+                        const messagePlace = document.getElementById('likeErrorMessage');
+                        messagePlace.innerText = '';
+                    }
                 })
                 .catch(err => console.log('Error dislikeClicked', err));
             } else {
+                console.log('else, error');
                 const messagePlace = document.getElementById('likeErrorMessage');
-                messagePlace.innerText = 'Vous ne pouvez pas disliker cette publication.'
+                messagePlace.innerText = 'Vous ne pouvez pas disliker cette publication.';
             }
         },
         modifyButton() {
@@ -281,14 +385,40 @@ export default {
                 }
             })
             .catch(err => console.log('Error ModConditionsAndAdmin', err));
-        }
+        },
+        /*mounted() {
+            this.loadData();
+        },
+        loadData() {
+            Promise.all([
+                this.loadLikeList(),
+                this.loadDislikeList()
+            ])
+            .then(values => {
+                this.likeList = values[0];
+                this.dislikeList = values[1];
+            })
+            .catch(error => console.log('Error loadData', error))
+        },
+        loadLikeList() {
+            return fetch(`http://localhost:3000/api/posts/${this.postId}`)
+            .then(res => res.json())
+            .then(result => result[0].usersLike)
+        },
+        loadDislikeList() {
+            return fetch(`http://localhost:3000/api/posts/${this.postId}`)
+            .then(res => res.json())
+            .then(result => result[0].usersDislike)
+        }*/
     }
 }
 </script>
 
 <style lang="scss">
 div.published-post {
-    background-color: #BBC8CA;
+    display: flex;
+    flex-direction: column;
+    background-color: #FFD7D7;
     border-radius: 15px/15px;
     margin-bottom: 2em;
     padding: 1em 0.75em 1.5em 0.75em;
@@ -299,18 +429,60 @@ div.published-post {
     }
     &>p.post-text {
         background-color: white;
-        border: #3F826D solid 2px;
-        width: 90%;
+        border: #002626 solid 2px;
+        width: 95%;
         white-space: pre-wrap;
         padding: 0.75em 0.5em;
         align-self: center;
     }
     &>h2 {
-        color: #3F826D;
+        color: #002626;
     }
     &>img {
         width: 95%;
-        border: #3F826D solid 3px;
+        border: #002626 solid 3px;
+        align-self: center;
+    }
+    &>div.like-date {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        &>div {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            width: 10%;
+            justify-content: space-between;
+            &>button{
+                align-self: center;
+                border-radius: 15px/15px;
+                border: #002626 solid 1px;
+                box-shadow: 2px 2px 3px #0E4749;
+                padding: 0.25em 0.5em;
+                margin-right: 0.25em;
+                &.liked {
+                    background-color: #002626;
+                    color: white;
+                }
+                &.not-liked {
+                    background-color: white;
+                    color: #002626;
+                }
+                
+            }
+        }
+    }
+    &>div.modify-buttons {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        &>button {
+            color: #002626;
+            border-radius: 15px/15px;
+            border: #002626 solid 1px;
+            box-shadow: solid 2px 2px 3px #0E4749;
+            padding: 0.5em 0.75em;
+        }
     }
 }
 

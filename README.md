@@ -4,7 +4,10 @@ In creation...
 
 ## GENERAL INFOS ##
 
-Repo for the last project of OpenClassrooms' Web Developer course
+Repo for the seventh and last project on the OpenClassroom's Web Developper course.  
+The project is to create from scratch a social media app for internal use in a company.  
+Fonctionnalities to be deployed are sharing and reacting/commenting to gifs, with 9GAG as an inspiration, and to articles, with Reddit as an inspiration.  
+To apply what was taught in the course, I used 
 
 ## RESOURCES ##
 
