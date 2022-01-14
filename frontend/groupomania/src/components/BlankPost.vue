@@ -100,7 +100,7 @@ export default {
                         alert('Une erreur s\'est produite');
                     } else {
                         alert('La publication a bien été enregistrée');
-                        this.$router.push('Posts');
+                        this.$router.push('posts');
                     }
                 })
             } else {
@@ -118,7 +118,7 @@ export default {
                         alert('Une erreur s\'est produite');
                     } else {
                         alert('La publication a bien été enregistrée');
-                        this.$router.push('Posts');
+                        this.$router.push('posts');
                     }
                 })
                 .catch(err => console.log('Error publishPost', err));

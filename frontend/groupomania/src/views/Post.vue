@@ -1,34 +1,35 @@
 <template>
     <div class="view-Post">
         <HeaderPost />
-        <Post 
-            postTile="{{ post.title }}"
-            postTextPost="{{ post.text }}"
-            userName="{{ getUserName(post.user_id) }}"
-            post="{{ post.text }}"
-            imageUrl="{{ post.imageUrl }}"
-            imageAlt="{{ post.imageAlt }}"
-            likeNumber="{{ post.likes }}"
-            dislikeNumber="{{ post.dislikes }}"
-            date="{{ getDate(post.date) }}"
-            postId="{{ postId }}"
-            postModConditions="{{ true }}" 
-            postImagePost="{{ post.imageUrl }}"
-            userId="{{ post.user_id }}"
-            linkToPost="{{ null }}"
-            postNeedLinkToPost="{{ false }}"/>
+        <div v-if="loaded">
+            <Post 
+                :postTitle="post.title" 
+                :post="post.text"
+                :imageUrl="post.imageUrl" 
+                :imageAlt="post.imageAlt" 
+                :likeNumber="post.likes"
+                :dislikeNumber="post.dislikes"
+                :date="getDate(post.date)"
+                :postId="post.id"
+                :postModConditions="true"
+                :postTextPost="isThereText(post.text)" 
+                :postImagePost="!isThereText(post.text)"
+                :userId="post.user_id"
+                :postNeedLinkToPost="false"/>
+        </div>
         <BlankComment 
-            postId="{{ post.id }}"
-            userName="{{ getUserName(parseInt(localStorage.getItem('currentUserId'), 10)) }}"
+            :postId="post.id"
             @new-comment-publisehd="addNewComment"/>
-        <PublishedComment 
-            v-for="comment in commentList"
-            :key="comment.id"
-            :userName="getUserName(comment.user_id)"
-            :propComment="comment.text"
-            :likeNumber="comment.likes"
-            :dislikeNumber="comment.dislikes"
-            :date="getDate(comment.date)"/>
+        <div v-if="commentLoaded">
+            <PublishedComment 
+                v-for="comment in commentList"
+                :key="comment.id"
+                :userName="getUserName(comment.user_id)"
+                :propComment="comment.text"
+                :likeNumber="comment.likes"
+                :dislikeNumber="comment.dislikes"
+                :date="getDate(comment.date)"/>
+        </div>
     </div>
 </template>
 
@@ -54,16 +55,17 @@ export default {
     },
     methods: {
         getDate(date) {
-            //"YYYY-MM-DD HH:MM:SS"
-            const firstSplit = date.split('-');
-            const year = firstSplit[0];
-            const monthNum = firstSplit('-')[1];
-            const secondSplit = firstSplit[2].split(' ');
-            const day = secondSplit[0];
-            const thirdSplit = secondSplit[1].split(':');
-            const hour = thirdSplit[0];
-            const minutes = thirdSplit[1];
-            const seconds = thirdSplit[2];
+            //"yyyy-mm-ddThh:mm:ss.000Z"
+            const firstSplit = date.split('-'); //['yyyy', 'mm', 'ddThh:mm:ss.000Z']
+            const year = firstSplit[0]; // 'yyyy'
+            const monthNum = firstSplit[1]; //'mm'
+            const secondSplit = firstSplit[2].split('T'); // ['dd', 'hh:mm:ss.000Z']
+            const day = secondSplit[0]; // 'dd'
+            const thirdSplit = secondSplit[1].split(':'); // ['hh', 'mm', 'ss.000Z']
+            const hour = thirdSplit[0]; // 'hh'
+            const minutes = thirdSplit[1]; // 'mm'
+            const fourthSplit = thirdSplit[2].split('.'); // ['ss', '000Z']
+            const seconds = fourthSplit[0]; // 'ss'
 
             const months = {
                 '01': "Janvier",

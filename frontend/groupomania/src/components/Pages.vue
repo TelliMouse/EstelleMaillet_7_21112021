@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="loadNumPost">
         <div v-if="isThereAPreviousPage">
             <router-link to="/posts">
                 <fa icon="fast-backward" alt="Icone double flèche vers la gauche" />
@@ -31,7 +31,9 @@ export default {
             currentPage: this.getCurrentPage(),
             previousPageLink: this.getPreviousPageLink(),
             nextPageLink: this.getNextPageLink(),
-            lastPageLink: this.getLastPageLink()
+            lastPageLink: this.getLastPageLink(),
+            loadNumPost: false,
+
         }
     },
     methods: {
@@ -39,8 +41,9 @@ export default {
             fetch('http://localhost:3000/api/posts')
             .then(res => res.json())
             .then(result => {
-            const parsedResult = JSON.parse(result);
-            return parsedResult.length;
+                this.loadNumPost = true;
+                const parsedResult = JSON.parse(result);
+                return parsedResult.length;
             })
             .catch(err => console.log('Error getNumberOfPosts', err));
         },

@@ -8,7 +8,7 @@
                 <p>Nouveau Post</p>
             </router-link>
             <router-link to="/login" @click="wipeLocalStorage">
-                <fa ison="sign-out-alt"/>
+                <fa icon="sign-out-alt"/>
                 <p>Quitter</p>
             </router-link>
         </nav>

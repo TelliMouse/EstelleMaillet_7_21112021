@@ -1,23 +1,24 @@
 <template>
     <div>
         <HeaderPost />
-        <Post 
-            v-for="post in postList"
-            :key="post.id"
-            :postTitle="post.title" 
-            :userName="getUserName(post.user_id)"
-            :post="post.text"
-            :imageUrl="post.imageUrl" 
-            :imageAlt="post.imageAlt" 
-            :likeNumber="post.likes"
-            :dislikeNumber="post.dislikes"
-            :date="getDate(post.date)"
-            :postId="post.id"
-            :postModConditions="false"
-            :postTextPost="isThereText(post.text)" 
-            :postImagePost="!isThereText(post.text)"
-            :userId="post.user_id"
-            :postNeedLinkToPost="true"/>
+        <div v-if="loadList">
+            <Post 
+                v-for="post in postList"
+                :key="post.id"
+                :postTitle="post.title"
+                :post="post.text"
+                :imageUrl="post.imageUrl" 
+                :imageAlt="post.imageAlt" 
+                :likeNumber="post.likes"
+                :dislikeNumber="post.dislikes"
+                :date="getDate(post.date)"
+                :postId="post.id"
+                :postModConditions="false"
+                :postTextPost="isThereText(post.text)" 
+                :postImagePost="!isThereText(post.text)"
+                :userId="post.user_id"
+                :postNeedLinkToPost="true"/>
+        </div>
         <Pages />
     </div>
 </template>
@@ -37,7 +38,10 @@ export default {
     data() {
         return {
             postList : this.getPostList(),
-            users: this.getUsers()
+            //users: this.getUsers(),
+            loadList: false,
+            nameLoaded: false,
+            //loaded: this.loadList && this.loadName
         }
     },
     methods: {
@@ -48,7 +52,7 @@ export default {
                 return false;
             }
         },
-        getUsers() {
+        /*getUsers() {
             fetch('http://localhost:3000/api/users')
             .then(res => res.json())
             .then(result => {
@@ -56,28 +60,29 @@ export default {
                 console.log('getUsers result', result)
             })
             .catch(err => console.log('Error getUsers', err));
-        },
+        },*/
         getUserName(userId) {
-            /*console.log('getUserName');
+            //console.log('getUserName');
             fetch(`http://localhost:3000/api/users/${userId}`)
             .then(res => res.json())
             .then(result => {
                 //const users = [];
                 const firstname = result.firstname;
                 const lastname = result.lastname;
-                console.log(firstname, lastname);
-                this.users = firstname + ' ' + lastname;
-                //return firstname + ' ' + lastname;
+                //console.log(firstname, lastname);
+                //this.users = firstname + ' ' + lastname;
+                this.nameLoaded = true;
+                return firstname + ' ' + lastname;
             })
-            .catch(err => console.log('Error getUserName', err));*/
+            .catch(err => console.log('Error getUserName', err));
             //const userList = this.users;
             //console.log('getusername userlist', userList)
-            console.log('users befor iteration: ', this.users);
+            /*console.log('users befor iteration: ', this.users);
             for(let user of this.users) {
                 if(user.id == userId) {
                     return user.firstname + ' ' + user.lastname
                 }
-            }
+            }*/
         },
         getDate(date) {
             //"yyyy-mm-ddThh:mm:ss.000Z"
@@ -136,7 +141,8 @@ export default {
                     }
                 }
 
-                this.postList = result;
+                this.loadList = true;
+                return this.postList = result;
             })
             .catch(err => console.log('Error getPostList', err));
         }

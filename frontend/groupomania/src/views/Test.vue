@@ -1,165 +1,65 @@
 <template>
     <div class="view-Post">
-        <Post
-        v-for="post in postList"
-        :key="post.id"
-        :postTitle="post.title"
-        :postTextPost="isThereText(post.text)"
-        :userName="getUserName(post.id)"
-        :post="post.text"
-        :imageUrl="post.imageUrl"
-        :imageAlt="post.imageAlt"
-        :likeNumber="post.likes"
-        :dislikeNumber="post.dislikes"
-        :date="getDate(post.date)"
-        :postId="post.id"
-        :postModConditions="true"
-        :postImagePost="!isThereText(post.text)"
-        :userId="post.user_id"
-        :linkToPost="null"
-        :postNeedLinkToPost="false"/>
-        <button @click="add">Ajouter</button>
+        <HeaderNewPost />
+        <div v-if="loaded">
+            <Post 
+                :postTitle="post.title" 
+                :post="post.text"
+                :imageUrl="post.imageUrl" 
+                :imageAlt="post.imageAlt" 
+                :likeNumber="post.likes"
+                :dislikeNumber="post.dislikes"
+                :date="getDate(post.date)"
+                :postId="post.id"
+                :postModConditions="true"
+                :postTextPost="isThereText(post.text)" 
+                :postImagePost="!isThereText(post.text)"
+                :userId="post.user_id"
+                :postNeedLinkToPost="false"
+                @post-modified="modifyPost"/>
+            <BlankComment 
+                :postId="post.id"
+                @new-comment-published="addNewComment"/>
+        </div>
+        <div v-if="commentLoaded">
+            <PublishedComment 
+                v-for="comment in commentList"
+                :key="comment.id"
+                :propComment="comment.text"
+                :likeNumber="comment.likes"
+                :dislikeNumber="comment.dislikes"
+                :date="getDate(comment.date)"
+                :userId="comment.user_id"
+                :commentId="comment.id"
+                @comment-modified="modifyComment"
+                @comment-deleted="deleteComment"/>
+        </div>
     </div>
 </template>
 
 <script>
 import Post from '../components/Post.vue'
+import HeaderNewPost from '../components/HeaderNewPost.vue'
+import BlankComment from '../components/BlankComment.vue'
+import PublishedComment from '../components/PublishedComment.vue'
 
 export default {
     name: 'Test',
     components: {
-        Post
+        Post,
+        HeaderNewPost,
+        BlankComment,
+        PublishedComment
     },
     data() {
         return {
-            name: '',
-            post: 'Ceci est un test',
-            postList: [
-    {
-        id: 8,
-        user_id: 2,
-        text: null,
-        imageUrl: "http://localhost:3000/images/téléchargement.jpg1640188300275.jpg",
-        imageAlt: "essai formdata",
-        likes: 0,
-        dislikes: 0,
-        usersLike: "[]",
-        usersDislike: "[]",
-        date: "2021-12-22T15:51:40.000Z",
-        title: "essai formdata2"
-    },
-    {
-        id: 6,
-        user_id: 2,
-        text: "test",
-        imageUrl: null,
-        imageAlt: null,
-        likes: 0,
-        dislikes: 0,
-        usersLike: "[]",
-        usersDislike: "[]",
-        date: "2021-12-17T16:56:15.000Z",
-        title: "test text formdata"
-    },
-    {
-        id: 5,
-        user_id: 2,
-        text: null,
-        imageUrl: "",
-        imageAlt: "test image",
-        likes: 0,
-        dislikes: 0,
-        usersLike: "[]",
-        usersDislike: "[]",
-        date: "2021-12-15T14:33:43.000Z",
-        title: "test image"
-    },
-    {
-        id: 4,
-        user_id: 2,
-        text: null,
-        imageUrl: "",
-        imageAlt: "image test",
-        likes: 0,
-        dislikes: 0,
-        usersLike: "[]",
-        usersDislike: "[]",
-        date: "2021-12-15T14:28:49.000Z",
-        title: "test image"
-    },
-    {
-        id: 3,
-        user_id: 2,
-        text: null,
-        imageUrl: "",
-        imageAlt: "test image",
-        likes: 0,
-        dislikes: 0,
-        usersLike: "[]",
-        usersDislike: "[]",
-        date: "2021-12-15T14:23:42.000Z",
-        title: "test image"
-    },
-    {
-        id: 2,
-        user_id: 2,
-        text: "Autre test sans auth",
-        imageUrl: null,
-        imageAlt: null,
-        likes: 0,
-        dislikes: 0,
-        usersLike: "[]",
-        usersDislike: "[]",
-        date: "2021-12-14T15:41:28.000Z",
-        title: "Deuxième test"
-    },
-    {
-        id: 1,
-        user_id: 2,
-        text: "essai modification",
-        imageUrl: null,
-        imageAlt: null,
-        likes: 0,
-        dislikes: 0,
-        usersLike: "[]",
-        usersDislike: "[]",
-        date: "2021-12-14T15:39:03.000Z",
-        title: "Premier test sans auth"
-    }
-]
-            /*[
-                {
-                    id: 1,
-                    title: 'Titre 1',
-                    text: 'Texte 1',
-                    userName: 'User1',
-                    date: 'Date1',
-                    user_id: 1
-                },
-                {
-                    id: 2,
-                    title: 'Titre 2',
-                    text: 'Texte 2',
-                    userName: 'User2',
-                    date: 'Date2',
-                    user_id: 2
-                }
-            ]*/
+            post: this.getPost(),
+            commentList: this.getComments(),
+            loaded: false,
+            commentLoaded: false
         }
     },
     methods: {
-        add() {
-            const post3 = {
-                id: 3,
-                title: 'Titre 3',
-                text: 'Texte 3',
-                userName: 'User3',
-                date: 'Date3',
-                user_id: 3
-            };
-
-            this.postList.push(post3);
-        },
         isThereText(text) {
             if(text) {
                 return true;
@@ -167,24 +67,9 @@ export default {
                 return false;
             }
         },
-        getUserName(userId) {
-            console.log('getUserName');
-            fetch(`http://localhost:3000/api/users/${userId}`)
-            .then(res => res.json())
-            .then(result => {
-                console.log('user nam result: ', result);
-                const firstname = result.firstname;
-                console.log('firstname: ', firstname);
-                const lastname = result.lastname;
-                console.log('lastname: ', lastname);
-                const name = `${firstname} ${lastname}`
-                return name;
-            })
-            .catch(err => console.log('Error getUserName', err));
-        },
         getDate(date) {
+            console.log('date:', date)
             //"yyyy-mm-ddThh:mm:ss.000Z"
-            console.log('date: ', date);
             const firstSplit = date.split('-'); //['yyyy', 'mm', 'ddThh:mm:ss.000Z']
             const year = firstSplit[0]; // 'yyyy'
             const monthNum = firstSplit[1]; //'mm'
@@ -198,14 +83,23 @@ export default {
 
             const months = {
                 '01': "Janvier",
+                '1': "Janvier",
                 '02': "Février",
+                '2': "Février",
                 '03': "Mars",
+                '3': "Mars",
                 '04': "Avril",
+                '4': "Avril",
                 '05': "Mai",
+                '5': "Mai",
                 '06': "Juin",
+                '6': "Juin",
                 '07': "Juillet",
+                '7': "Juillet",
                 '08': "Août",
+                '8': "Août",
                 '09': "Septembre",
+                '9': "Septembre",
                 '10': "Octobre",
                 '11': "Novembre",
                 '12': "Décembre"
@@ -215,10 +109,78 @@ export default {
 
             return day + ' ' + month + ' ' + year + ', ' + hour + 'h' + minutes + 'm' + seconds + 's';
         },
-    },
-    //created() {
-    //    this.name = this.getUserName(2);
-    //}
+        getPost() {
+            //const url = window.location.href;
+            //const urlParams = new URLSearchParams(url);
+            //const postId = urlParams.get('id');
+            const postId = 10;
+
+            fetch(`http://localhost:3000/api/posts/${postId}`)
+            .then(res => res.json())
+            .then(result => {
+                console.log('res getpost', result);
+                this.loaded = true;
+                return this.post = result[0];
+            })
+            .catch(err => console.log('Error getPost', err));
+        },
+        getComments() {
+            //const url = window.location.href;
+            //const urlParams = new URLSearchParams(url);
+            //const postId = urlParams.get('id');
+            const postId = 10;
+
+            fetch(`http://localhost:3000/api/posts/${postId}/comments`)
+            .then(res => res.json())
+            .then(result => {
+                this.commentLoaded = true;
+                return this.commentList = result;
+            })
+            .catch(err => console.log('Error getComments', err));
+        },
+        //reloadPage() {
+        //    this.$forceUpdate();
+        //}
+        addNewComment(payload) {
+            console.log('addnewcomment payload: ', payload);
+            this.commentList.push({
+                ...payload,
+                likes: 0,
+                dislikes: 0,
+                usersLike: [],
+                usersDislike: []
+            });
+        },
+        modifyComment(payload) {
+            //trouver l'index du comment à changer dans commentList
+            const findIndexOfComment = () => {
+                for(let i = 0; i < this.commentList.length; i++) {
+                    if(this.commentList[i].id == payload.id)  {
+                        return i
+                    }
+                }
+            };
+
+            const index = findIndexOfComment();
+            this.commentList[index].text = payload.text;
+        },
+        deleteComment(payload) {
+            const findIndexOfComment = () => {
+                for(let i = 0; i < this.commentList.length; i++) {
+                    if(this.commentList[i].id == payload.id)  {
+                        return i
+                    }
+                }
+            };
+
+            const index = findIndexOfComment();
+            this.commentList.splice(index, 1);
+        },
+        modifyPost() {
+            this.loaded = false;
+            return this.post = this.getPost();
+        }
+    }
 }
 </script>
 

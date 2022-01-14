@@ -3,7 +3,7 @@
         <h1 v-if="!modifyClicked">{{ postTitle }}</h1>
         <input v-if="modifyClicked" type="text" id="changeTitle" v-model="modelTitle"/>
 
-        <h2>{{ userName }}</h2>
+        <h2 v-if="loadName">{{ userName }}</h2>
 
         <p class="post-text" v-if="textPost && !modifyClicked">{{ post }}</p>
         <textarea v-if="textPost && modifyClicked" name="textarea" rows="5" cols="30" v-model="modelPost"></textarea>
@@ -27,8 +27,8 @@
         <p id="likeErrorMessage"></p>
         <button v-if="modifyClicked" @click="modifyPost">Publier</button>
         <div class="modify-buttons">
-            <button v-if="modConditions" @click="modifyButton">Modifier</button>
-            <button v-if="modConditions || modConditionsAndAdmin" @click="deletePost">Supprimer</button>
+            <button v-if="displayButtons" @click="modifyButton">Modifier</button>
+            <button v-if="displayButtons || displayButtonsAdmin" @click="deletePost">Supprimer</button>
         </div>
         <router-link :to="{ name: 'Post', params: { id: postId}}" v-if="needLinkToPost">Voir la publication</router-link>
     </div>
@@ -40,7 +40,7 @@ export default {
     props: {
         postTitle: String,
         postTextPost: Boolean,
-        userName: String,
+        //userName: String,
         post: String,
         imageUrl: String,
         imageAlt: String,
@@ -51,7 +51,8 @@ export default {
         postModConditions: Boolean,
         postImagePost: Boolean,
         userId: Number, //id of the user who made the post
-        postNeedLinkToPost: Boolean
+        postNeedLinkToPost: Boolean,
+        //loadName: Boolean
     },
     data() {
         return {
@@ -69,10 +70,29 @@ export default {
             shownDislikeNumber: this.dislikeNumber,
             likeList: [], //this.getLikeList(),
             dislikeList: [], //this.getDislikeList()
-            hasTheUser: this.hasTheUserAlreadyLiked()
+            hasTheUser: this.hasTheUserAlreadyLiked(),
+            displayButtons: this.modConditions(),
+            displayButtonsAdmin: this.modConditionsAndAdmin(),
+            userName: this.getUserName(this.userId),
+            loadName: false
         }
     },
     methods: {
+        getUserName(userId) {
+            console.log('getUserName');
+            fetch(`http://localhost:3000/api/users/${userId}`)
+            .then(res => res.json())
+            .then(result => {
+                //const users = [];
+                const firstname = result.firstname;
+                const lastname = result.lastname;
+                //console.log(firstname, lastname);
+                //this.users = firstname + ' ' + lastname;
+                this.loadName = true;
+                return this.userName = firstname + ' ' + lastname;
+            })
+            .catch(err => console.log('Error getUserName', err));
+        },
         /*getLikeList() {
             console.log('getlikelist');
             fetch(`http://localhost:3000/api/posts/${this.postId}`)
@@ -155,17 +175,17 @@ export default {
         isLiked() {
             console.log('isLiked');
             if(this.hasTheUser === 'liked') {
-                return true;
+                return this.liked = true;
             } else {
-                return false;
+                return this.liked = false;
             }
         },
         isDisliked() {
             console.log('isDisliked');
             if(this.hasTheUser === 'disliked') {
-                return true;
+                return this.disliked = true;
             } else {
-                return false;
+                return this.disliked = false;
             }
         },
         likeClicked() {
@@ -304,7 +324,7 @@ export default {
             const modifiedPost = {
                 title: this.postTitle,
                 user_id: this.userId,
-                text: this.post,
+                text: this.modelPost,
                 imageAlt: this.imageAlt
             };
             if(this.files) {
@@ -321,11 +341,12 @@ export default {
                 })
                 .then(res => res.json())
                 .then(result => {
-                    if(!result) {
+                    if(!result || result.error) {
                         alert('Une erreur s\'est produite');
                     } else {
                         alert('La publication a bien été modifiée!')
-                        this.$forceUpdate();
+                        this.$emit('post-modified');
+                        this.modifyClicked = false;
                     }
                 })
                 .catch(err => console.log('Error modifyPost', err))
@@ -340,11 +361,12 @@ export default {
                 })
                 .then(res => res.json())
                 .then(result => {
-                    if(!result) {
+                    if(!result || result.error) {
                         alert('Une erreur s\'est produite');
                     } else {
                         alert('La publication a bien été modifiée!')
-                        this.$forceUpdate();
+                        this.$emit('post-modified');
+                        this.modifyClicked = false;
                     }
                 })
                 .catch(err => console.log('Error modifyPost', err))
@@ -368,20 +390,22 @@ export default {
         modConditions() {
             const currentUserId = JSON.parse(localStorage.getItem('currentUserId'));
             if(currentUserId == this.userId && this.postModConditions) {
-                return true;
+                console.log('buttons affichés');
+                return this.displayButtons = true;
             } else {
-                return false;
+                console.log('buttons pas affichés');
+                return this.displayButtons = false;
             }
         },
         modConditionsAndAdmin() {
             const currentUserId = JSON.parse(localStorage.getItem('currentUserId'));
             fetch(`http://localhost:3000/api/users/${currentUserId}`)
-            .then(res => {
-                const result = JSON.parse(res.json());
-                if(result.admin && this.postModConditions) {
-                    return true;
+            .then(res => res.json())
+            .then(result => {
+                if(parseInt(result.admin.data[0], 10) && this.postModConditions) {
+                    return this.displayButtonsAdmin = true;
                 } else {
-                    return false;
+                    return this.displayButtonsAdmin = false;
                 }
             })
             .catch(err => console.log('Error ModConditionsAndAdmin', err));

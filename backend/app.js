@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
 
 const userRoutes = require('./routes/user.routes');
 const postRoutes = require('./routes/post.routes');
@@ -8,6 +9,8 @@ const commentRoutes = require('./routes/comment.routes');
 
 
 const app = express();
+
+app.use(helmet());
 
 //Addition of headers to avoid CORS error
 app.use((req, res, next) => {

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h3>{{ userName }}</h3>
+        <h3 v-if="loadName">{{ userName }}</h3>
         <label for="comment">Votre commentaire:</label>
         <textarea name="text" id="comment" cols="30" rows="10" v-model="comment"></textarea>
         <button @click="publishComment">Publier</button>
@@ -11,19 +11,33 @@
 export default {
     name: 'BlankComment',
     props: {
-        postId: Number,
-        userName: String
+        postId: Number
     },
     data() {
         return {
-            comment: ''
+            comment: '',
+            userName: this.getUserName(),
+            loadName: false
         }
     },
     methods: {
+        getUserName() {
+            const userId = parseInt(localStorage.getItem('currentUserId'), 10)
+            fetch(`http://localhost:3000/api/users/${userId}`)
+            .then(res => res.json())
+            .then(result => {
+                const firstname = result.firstname;
+                const lastname = result.lastname;
+                this.loadName = true;
+                return this.userName = firstname + ' ' + lastname;
+            })
+            .catch(err => console.log('Error getUserName', err));
+        },
         publishComment() {
             const currentUserId = JSON.parse(localStorage.getItem('currentUserId'));
             const date = new Date(Date.now());
-            const commentDate = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+            const commentDate = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + 'T' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+            console.log('commentdate: ', commentDate);
 
             fetch(`http://localhost:3000/api/comments`, {
                 method: 'POST',
@@ -38,14 +52,21 @@ export default {
                     date: commentDate
                 })
             })
-            .then(() => {
-                alert('Votre commentaire a été publié.');
-                this.$emit('new-comment-published', {
-                    user_id: currentUserId,
-                    post_id: this.postId,
-                    text: this.comment,
-                    date: commentDate
-                });
+            .then(res => res.json())
+            .then(result => {
+                if(result.error) {
+                    alert('Une erreur est survenue');
+                } else {
+                    alert('Votre commentaire a été publié.');
+                    this.$emit('new-comment-published', {
+                        id: result.id,
+                        user_id: currentUserId,
+                        post_id: this.postId,
+                        text: this.comment,
+                        date: commentDate
+                    });
+                    this.comment = '';
+                }
             })
             .catch(err => console.log('Error publishComment', err));
         }

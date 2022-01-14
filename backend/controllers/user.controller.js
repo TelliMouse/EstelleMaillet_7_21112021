@@ -63,20 +63,16 @@ exports.login = (req, res, next) => {
 
 //validé Postman
 exports.getUserById = (req, res, next) => {
-    console.log('début contr getUserById');
     sql.query(`SELECT * FROM user WHERE id = ${req.params.id}`, (error, result) => {
         if(error) res.status(404).json({ error });
-        console.log('fin contr get UserById');
         res.status(200).json(result[0]);
     })
 };
 
 //validé Postman
 exports.getAllUsers = (req, res, next) => {
-    console.log('début contr getAllUsers');
     sql.query('SELECT * FROM user', (error, result) => {
         if(error) res.status(400).json({ error });
-        console.log('fin contr getAllUsers');
         res.status(200).json(result);
     })
 }

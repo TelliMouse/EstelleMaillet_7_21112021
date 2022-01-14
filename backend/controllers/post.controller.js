@@ -143,7 +143,8 @@ exports.likePost = (req, res, next) => {
 
         //req.body.like can be 1 (when user likes), -1(when they dislike), or 0(when they delete their like/dislike)
         //If the user liked and hasn't already liked or disliked, we update the number of likes, and the array of user ID which liked
-        if(req.body.like === '1' && !hasTheUserAlreadyLikedOrDisliked()) {
+        console.log('before conds, hastheuser: ', hasTheUserAlreadyLikedOrDisliked());
+        if(req.body.like === 1 && !hasTheUserAlreadyLikedOrDisliked()) {
             console.log('condition 1');
             likesList.push(req.body.user_id);
             const postObject = {
@@ -156,7 +157,7 @@ exports.likePost = (req, res, next) => {
                 res.status(200).json({message: 'Post successfully liked!'});
             })
          //If the user disliked and hasn't already liked or disliked, we update the number of dislikes, and the array of user ID which disliked
-        } else if(req.body.like === '-1' && !hasTheUserAlreadyLikedOrDisliked()) {
+        } else if(req.body.like === -1 && !hasTheUserAlreadyLikedOrDisliked()) {
             console.log('condition 2');
             dislikesList.push(req.body.user_id);
             const postObject = {
@@ -169,7 +170,7 @@ exports.likePost = (req, res, next) => {
                 res.status(200).json({message: 'Post successfully disliked!'});
             })
         //If the user resets their like/dislike and has already liked, we update the number of likes, and the array of user ID which liked
-        } else if(req.body.like === '0' & hasTheUserAlreadyLikedOrDisliked() === 'likes') {
+        } else if(req.body.like === 0 & hasTheUserAlreadyLikedOrDisliked() === 'likes') {
             console.log('condition 3');
             const index = likesList.indexOf(req.body.user_id);
             likesList.splice(index, 1);
@@ -183,7 +184,7 @@ exports.likePost = (req, res, next) => {
                 res.status(200).json({message: 'Post successfully unliked!'});
             })
         //If the user resets their like/dislike and has already disliked, we update the number of dislikes, and the array of user ID which disliked
-        } else if(req.body.like === '0' && hasTheUserAlreadyLikedOrDisliked() === 'dislikes') {
+        } else if(req.body.like === 0 && hasTheUserAlreadyLikedOrDisliked() === 'dislikes') {
             console.log('condition 4');
             const index = dislikesList.indexOf(req.body.user_id);
             dislikesList.splice(index, 1);
@@ -197,6 +198,8 @@ exports.likePost = (req, res, next) => {
                 res.status(200).json({message: 'Post successfully undisliked!'});
             })
         } else {
+            console.log('else');
+            console.log('like', req.body.like);
             return res.status(400).json({message: 'The user cannot like/dislike the post'});
         }
     })

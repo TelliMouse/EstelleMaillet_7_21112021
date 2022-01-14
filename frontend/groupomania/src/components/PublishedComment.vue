@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h3>{{ userName }}</h3>
+        <h3 v-if="loadName">{{ userName }}</h3>
         <p v-if="!modifyClicked">{{ comment }}</p>
         <textarea v-if="modifyClicked" name="textarea" v-model="comment"></textarea>
         <div>
@@ -10,7 +10,7 @@
             </div>
             <p>{{ date }}</p>
         </div>
-        <p id="likeErrorMessage"></p>
+        <p id="likeErrorMessageComment"></p>
         <button v-if="modifyClicked" @click="modifyComment">Publier</button>
         <div>
             <button v-if="modConditions" @click="modifyButton">Modifier</button>
@@ -24,7 +24,6 @@
 export default {
     name: 'PublishedComment',
     props: {
-        userName: String,
         propComment: String,
         likeNumber: Number,
         dislikeNumber: Number,
@@ -39,52 +38,74 @@ export default {
             disliked: this.isDisliked(),
             modifyClicked: false,
             shownLikeNumber: this.likeNumber,
-            shownDislikeNumber: this.dislikeNumber
+            shownDislikeNumber: this.dislikeNumber,
+            userName: this.getUserName(this.userId),
+            loadName: false,
+            hasTheUser: this.hasTheUserAlreadyLiked()
         }
     },
     methods: {
+        getUserName(userId) {
+            fetch(`http://localhost:3000/api/users/${userId}`)
+            .then(res => res.json())
+            .then(result => {
+                const firstname = result.firstname;
+                const lastname = result.lastname;
+                this.loadName = true;
+                return this.userName = firstname + ' ' + lastname;
+            })
+            .catch(err => console.log('Error getUserName', err));
+        },
         hasTheUserAlreadyLiked() {
             const currentUserId = localStorage.getItem('currentUserId');
-
+            console.log('commentid: ', this.commentId);
             fetch(`http://localhost:3000/api/comments/${this.commentId}`)
-            .then(res => {
-                
-                const result = res.json();
-                const likeList = JSON.parse(result.usersLike);
-                const dislikeList = JSON.parse(result.usersDislike);
-
-                for(let userId of likeList) {
-                    if(currentUserId == userId) {
-                        return 'liked';
+            .then(res => res.json())
+            .then(result => {
+                const likeList = result[0].usersLike;
+                const dislikeList = result[0].usersDislike;
+                if(likeList != []) {
+                    for(let userId of likeList) {
+                        console.log('iteration hastheuserliked');
+                        if(currentUserId == userId) {
+                            console.log('hastheuser liked');
+                            return this.hasTheUser = 'liked';
+                        }
                     }
                 }
 
-                for(let userId of dislikeList) {
-                    if(currentUserId == userId) {
-                        return 'disliked';
+                if(dislikeList != []) {
+                    for(let userId of dislikeList) {
+                        if(currentUserId == userId) {
+                            console.log('hastheuser disliked');
+                            return this.hasTheUser = 'disliked';
+                        }
                     }
                 }
 
-                return false;
+                return this.hasTheUser = false
+            
             })
-            .catch(err => console.log('Error hasTheUserAlreadyLiked', err));
+            .catch(error => console.log('Error hasTheUserAlreadyLiked', error))
         },
         isLiked() {
-            if(this.hasTheUserAlreadyLiked() === 'liked') {
-                return true;
+            console.log('isLiked');
+            if(this.hasTheUser === 'liked') {
+                return this.liked = true;
             } else {
-                return false;
+                return this.liked = false;
             }
         },
         isDisliked() {
-            if(this.hasTheUserAlreadyLiked() === 'disliked') {
-                return true;
+            console.log('isDisliked');
+            if(this.hasTheUser === 'disliked') {
+                return this.disliked = true;
             } else {
-                return false;
+                return this.disliked = false;
             }
         },
         likeClicked() {
-            if(this.hasTheUserAlreadyLiked() === false) {
+            if(this.hasTheUser === false) {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
                     method: 'POST',
                     headers: {
@@ -96,12 +117,21 @@ export default {
                         like: 1
                     })
                 })
-                .then(() => {
-                    this.shownLikeNumber++;
-                    this.liked = true;
+                .then(res => res.json())
+                .then(result => {
+                    if(result == {message: 'The user cannot like/dislike the post'}) {
+                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        messagePlace.innerText = 'Vous ne pouvez pas liker cette publication.';
+                    } else {
+                        this.shownLikeNumber++;
+                        this.liked = true;
+                        this.hasTheUser = 'liked';
+                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        messagePlace.innerText = '';
+                    }
                 })
                 .catch(err => console.log('Error likeClicked', err));
-            } else if(this.hasTheUserAlreadyLiked() === 'liked') {
+            } else if(this.hasTheUser === 'liked') {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
                     method: 'POST',
                     headers: {
@@ -113,18 +143,27 @@ export default {
                         like: 0
                     })
                 })
-                .then(() => {
-                    this.shownLikeNumber--;
-                    this.liked = false;
+                .then(res => res.json())
+                .then(result => {
+                    if(result == {message: 'The user cannot like/dislike the post'}) {
+                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        messagePlace.innerText = 'Vous ne pouvez pas déliker cette publication.';
+                    } else {
+                        this.shownLikeNumber--;
+                        this.liked = false;
+                        this.hasTheUser = false;
+                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        messagePlace.innerText = '';
+                    }
                 })
                 .catch(err => console.log('Error likeClicked', err));
             } else {
-                const messagePlace = document.getElementById('likeErrorMessage');
+                const messagePlace = document.getElementById('likeErrorMessageComment');
                 messagePlace.innerText = 'Vous ne pouvez pas liker ce commentaire.'
             }
         },
         dislikeClicked() {
-            if(this.hasTheUserAlreadyLiked() === false) {
+            if(this.hasTheUser === false) {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
                     method: 'POST',
                     headers: {
@@ -136,12 +175,21 @@ export default {
                         like: -1
                     })
                 })
-                .then(() => {
-                    this.shownDislikeNumber++;
-                    this.disliked = true;
+                .then(res => res.json())
+                .then(result => {
+                    if(result == {message: 'The user cannot like/dislike the post'}) {
+                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        messagePlace.innerText = 'Vous ne pouvez pas disliker cette publication.';
+                    } else {
+                        this.shownDislikeNumber++;
+                        this.disliked = true;
+                        this.hasTheUser = 'disliked';
+                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        messagePlace.innerText = '';
+                    }
                 })
                 .catch(err => console.log('Error dislikeClicked', err));
-            } else if(this.hasTheUserAlreadyLiked() === 'disliked') {
+            } else if(this.hasTheUser === 'disliked') {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
                     method: 'POST',
                     headers: {
@@ -153,13 +201,22 @@ export default {
                         like: 0
                     })
                 })
-                .then(() => {
-                    this.shonwDislikeNumber--;
-                    this.disliked = false;
+                .then(res => res.json())
+                .then(result => {
+                    if(result == {message: 'The user cannot like/dislike the post'}) {
+                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        messagePlace.innerText = 'Vous ne pouvez pas dédisliker cette publication.';
+                    } else {
+                        this.shownDislikeNumber--;
+                        this.disliked = false;
+                        this.hasTheUser = false;
+                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        messagePlace.innerText = '';
+                    }
                 })
                 .catch(err => console.log('Error dislikeClicked', err));
             } else {
-                const messagePlace = document.getElementById('likeErrorMessage');
+                const messagePlace = document.getElementById('likeErrorMessageComment');
                 messagePlace.innerText = 'Vous ne pouvez pas disliker ce commentaire.'
             }
         },
@@ -180,7 +237,11 @@ export default {
             })
             .then(() => {
                 alert('Le commentaire a bien été modifiée!')
-                this.$router.push({ name: 'Posts'});
+                this.$emit('comment-modified', {
+                    id: this.commentId,
+                    text: this.comment
+                });
+                this.modifyClicked = false;
             })
             .catch(err => console.log('Error modifyComment', err))
         },
@@ -190,7 +251,9 @@ export default {
             })
             .then(() => {
                 alert('Le commentaire a bien été supprimée.');
-                this.$router.push({ name: 'Posts'});
+                this.$emit('comment-deleted', {
+                    id: this.commentId
+                })
             })
             .catch(err => console.log('Error deleteComment', err));
         },
