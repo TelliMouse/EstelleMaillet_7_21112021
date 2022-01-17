@@ -89,6 +89,7 @@ export default {
                 data.append('json', JSON.stringify(newPost));
                 fetch('http://localhost:3000/api/posts', {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                         "Accept": "application/json"
                     },
@@ -106,6 +107,7 @@ export default {
             } else {
                 fetch('http://localhost:3000/api/posts', {
                     method: 'POST',
+                    credentials: 'include', 
                     headers: {
                         "Accept": "application/json", 
                         "Content-Type": "application/json"
@@ -121,7 +123,10 @@ export default {
                         this.$router.push('posts');
                     }
                 })
-                .catch(err => console.log('Error publishPost', err));
+                .catch(err => {
+                    console.log('Error publishPost', err);
+                    alert('Une erreur s\'est produite');
+                });
             }
         }
     }

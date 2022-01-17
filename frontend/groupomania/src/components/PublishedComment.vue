@@ -46,7 +46,9 @@ export default {
     },
     methods: {
         getUserName(userId) {
-            fetch(`http://localhost:3000/api/users/${userId}`)
+            fetch(`http://localhost:3000/api/users/${userId}`, {
+                credentials: 'include'
+            })
             .then(res => res.json())
             .then(result => {
                 const firstname = result.firstname;
@@ -54,21 +56,23 @@ export default {
                 this.loadName = true;
                 return this.userName = firstname + ' ' + lastname;
             })
-            .catch(err => console.log('Error getUserName', err));
+            .catch(err => {
+                console.log('Error getUserName', err);
+                alert('Une erreur s\'est produite');
+                });
         },
         hasTheUserAlreadyLiked() {
             const currentUserId = localStorage.getItem('currentUserId');
-            console.log('commentid: ', this.commentId);
-            fetch(`http://localhost:3000/api/comments/${this.commentId}`)
+            fetch(`http://localhost:3000/api/comments/${this.commentId}`, {
+                credentials: 'include'
+            })
             .then(res => res.json())
             .then(result => {
                 const likeList = result[0].usersLike;
                 const dislikeList = result[0].usersDislike;
                 if(likeList != []) {
                     for(let userId of likeList) {
-                        console.log('iteration hastheuserliked');
                         if(currentUserId == userId) {
-                            console.log('hastheuser liked');
                             return this.hasTheUser = 'liked';
                         }
                     }
@@ -77,7 +81,6 @@ export default {
                 if(dislikeList != []) {
                     for(let userId of dislikeList) {
                         if(currentUserId == userId) {
-                            console.log('hastheuser disliked');
                             return this.hasTheUser = 'disliked';
                         }
                     }
@@ -86,10 +89,12 @@ export default {
                 return this.hasTheUser = false
             
             })
-            .catch(error => console.log('Error hasTheUserAlreadyLiked', error))
+            .catch(error => {
+                console.log('Error hasTheUserAlreadyLiked', error);
+                alert('Une erreur s\'est produite');
+                })
         },
         isLiked() {
-            console.log('isLiked');
             if(this.hasTheUser === 'liked') {
                 return this.liked = true;
             } else {
@@ -97,7 +102,6 @@ export default {
             }
         },
         isDisliked() {
-            console.log('isDisliked');
             if(this.hasTheUser === 'disliked') {
                 return this.disliked = true;
             } else {
@@ -108,6 +112,7 @@ export default {
             if(this.hasTheUser === false) {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -130,10 +135,14 @@ export default {
                         messagePlace.innerText = '';
                     }
                 })
-                .catch(err => console.log('Error likeClicked', err));
+                .catch(err => {
+                    console.log('Error likeClicked', err);
+                    alert('Une erreur s\'est produite');
+                    });
             } else if(this.hasTheUser === 'liked') {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -156,7 +165,10 @@ export default {
                         messagePlace.innerText = '';
                     }
                 })
-                .catch(err => console.log('Error likeClicked', err));
+                .catch(err => {
+                    console.log('Error likeClicked', err);
+                    alert('Une erreur s\'est produite');
+                    });
             } else {
                 const messagePlace = document.getElementById('likeErrorMessageComment');
                 messagePlace.innerText = 'Vous ne pouvez pas liker ce commentaire.'
@@ -166,6 +178,7 @@ export default {
             if(this.hasTheUser === false) {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -188,10 +201,14 @@ export default {
                         messagePlace.innerText = '';
                     }
                 })
-                .catch(err => console.log('Error dislikeClicked', err));
+                .catch(err => {
+                    console.log('Error dislikeClicked', err);
+                    alert('Une erreur s\'est produite');
+                    });
             } else if(this.hasTheUser === 'disliked') {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -214,7 +231,10 @@ export default {
                         messagePlace.innerText = '';
                     }
                 })
-                .catch(err => console.log('Error dislikeClicked', err));
+                .catch(err => {
+                    console.log('Error dislikeClicked', err);
+                    alert('Une erreur s\'est produite');
+                    });
             } else {
                 const messagePlace = document.getElementById('likeErrorMessageComment');
                 messagePlace.innerText = 'Vous ne pouvez pas disliker ce commentaire.'
@@ -229,6 +249,7 @@ export default {
             };
             fetch(`http://localhost:3000/api/comments/${this.commentId}`, {
                 method: 'PUT',
+                credentials: 'include',
                 headers: {
                 "Accept": "application/json", 
                 "Content-Type": "application/json"
@@ -243,11 +264,15 @@ export default {
                 });
                 this.modifyClicked = false;
             })
-            .catch(err => console.log('Error modifyComment', err))
+            .catch(err => {
+                console.log('Error modifyComment', err);
+                alert('Une erreur s\'est produite');
+                })
         },
         deleteComment() {
             fetch(`http://localhost:3000/api/comments/${this.commentId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                credentials: 'include'
             })
             .then(() => {
                 alert('Le commentaire a bien été supprimée.');
@@ -255,7 +280,10 @@ export default {
                     id: this.commentId
                 })
             })
-            .catch(err => console.log('Error deleteComment', err));
+            .catch(err => {
+                console.log('Error deleteComment', err);
+                alert('Une erreur s\'est produite');
+                });
         },
         modConditions() {
             const currentUserId = JSON.parse(localStorage.getItem('currentUserId'));
@@ -267,7 +295,9 @@ export default {
         },
         modConditionsAndAdmin() {
             const currentUserId = JSON.parse(localStorage.getItem('currentUserId'));
-            fetch(`http://localhost:3000/api/users/${currentUserId}`)
+            fetch(`http://localhost:3000/api/users/${currentUserId}`, {
+                credentials: 'include'
+            })
             .then(res => {
                 const result = JSON.parse(res.json());
                 if(result.admin) {
@@ -276,7 +306,10 @@ export default {
                     return false;
                 }
             })
-            .catch(err => console.log('Error ModConditionsAndAdmin', err));
+            .catch(err => {
+                console.log('Error ModConditionsAndAdmin', err);
+                alert('Une erreur s\'est produite');
+                });
         }
     }
 }

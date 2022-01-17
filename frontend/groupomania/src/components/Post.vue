@@ -79,80 +79,34 @@ export default {
     },
     methods: {
         getUserName(userId) {
-            console.log('getUserName');
-            fetch(`http://localhost:3000/api/users/${userId}`)
+            fetch(`http://localhost:3000/api/users/${userId}`, {
+                credentials: 'include'
+            })
             .then(res => res.json())
             .then(result => {
-                //const users = [];
                 const firstname = result.firstname;
                 const lastname = result.lastname;
-                //console.log(firstname, lastname);
-                //this.users = firstname + ' ' + lastname;
                 this.loadName = true;
                 return this.userName = firstname + ' ' + lastname;
             })
-            .catch(err => console.log('Error getUserName', err));
+            .catch(err => {
+                console.log('Error getUserName', err);
+                alert('Une erreur s\'est produite');
+                });
         },
-        /*getLikeList() {
-            console.log('getlikelist');
-            fetch(`http://localhost:3000/api/posts/${this.postId}`)
-            .then(res => res.json())
-            .then(result => {
-                console.log('result getlikelist: ', result);
-                this.likeList = result[0].usersLike;
-                //console.log('result: ', result);
-                //console.log('likelist: ', this.likeList)
-            })
-            .catch(err => console.log('Error hasTheUserAlreadyLiked', err));
-        },
-        getDislikeList() {
-            console.log('getdislikelist');
-            fetch(`http://localhost:3000/api/posts/${this.postId}`)
-            .then(res => res.json())
-            .then(result => {
-                this.dislikeList = result[0].usersDisike;
-                //console.log('dislikelist: ', this.dislikeList)
-            })
-            .catch(err => console.log('Error hasTheUserAlreadyLiked', err));
-        },*/
         hasTheUserAlreadyLiked() {
-            console.log('hastheuseralreadyliked');
             const currentUserId = localStorage.getItem('currentUserId');
 
-            //console.log('likelist: ', this.likeList);
-            //console.log('dislikelist: ', this.dislikeList);
-
-            /*if(this.likeList != []) {
-                for(let userId of this.likeList) {
-                    console.log('iteration hastheuserliked');
-                    if(currentUserId == userId) {
-                        console.log('hastheuser liked');
-                        return 'liked';
-                    }
-                }
-            }
-
-            if(this.dislikeList != []) {
-                for(let userId of this.dislikeList) {
-                    if(currentUserId == userId) {
-                        console.log('hastheuser disliked');
-                        return 'disliked';
-                    }
-                }
-            }
-
-            console.log('hastheuser: ', false);
-            return false;*/
-            fetch(`http://localhost:3000/api/posts/${this.postId}`)
+            fetch(`http://localhost:3000/api/posts/${this.postId}`, {
+                credentials: 'include'
+            })
             .then(res => res.json())
             .then(result => {
                 const likeList = result[0].usersLike;
                 const dislikeList = result[0].usersDislike;
                 if(likeList != []) {
                     for(let userId of likeList) {
-                        console.log('iteration hastheuserliked');
                         if(currentUserId == userId) {
-                            console.log('hastheuser liked');
                             return this.hasTheUser = 'liked';
                         }
                     }
@@ -161,7 +115,6 @@ export default {
                 if(dislikeList != []) {
                     for(let userId of dislikeList) {
                         if(currentUserId == userId) {
-                            console.log('hastheuser disliked');
                             return this.hasTheUser = 'disliked';
                         }
                     }
@@ -170,10 +123,12 @@ export default {
                 return this.hasTheUser = false
             
             })
-            .catch(error => console.log(error))
+            .catch(error => {
+                console.log('Error hasTheUserAlredyLiked', error);
+                alert('Une erreur s\'est produite');
+            })
         },
         isLiked() {
-            console.log('isLiked');
             if(this.hasTheUser === 'liked') {
                 return this.liked = true;
             } else {
@@ -181,7 +136,6 @@ export default {
             }
         },
         isDisliked() {
-            console.log('isDisliked');
             if(this.hasTheUser === 'disliked') {
                 return this.disliked = true;
             } else {
@@ -189,12 +143,10 @@ export default {
             }
         },
         likeClicked() {
-            console.log('likeClicked');
-            console.log('in likeclikcked hasthe user: ', this.hasTheUser);
             if(this.hasTheUser === false) {
-                console.log('hastheuser false');
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -217,11 +169,14 @@ export default {
                         messagePlace.innerText = '';
                     }
                 })
-                .catch(err => console.log('Error likeClicked', err));
+                .catch(err => {
+                    console.log('Error likeClicked', err);
+                    alert('Une erreur s\'est produite');
+                });
             } else if(this.hasTheUser === 'liked') {
-                console.log('hastheuser liked');
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -244,19 +199,20 @@ export default {
                         messagePlace.innerText = '';
                     }
                 })
-                .catch(err => console.log('Error likeClicked', err));
+                .catch(err => {
+                    console.log('Error likeClicked', err);
+                    alert('Une erreur s\'est produite');
+                });
             } else {
-                console.log('else, error');
                 const messagePlace = document.getElementById('likeErrorMessage');
                 messagePlace.innerText = 'Vous ne pouvez pas liker cette publication.';
             }
         },
         dislikeClicked() {
-            console.log('dislikeclicked');
             if(this.hasTheUser === false) {
-                console.log('hastheuser false');
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -279,11 +235,14 @@ export default {
                         messagePlace.innerText = '';
                     }
                 })
-                .catch(err => console.log('Error dislikeClicked', err));
+                .catch(err => {
+                    console.log('Error dislikeClicked', err);
+                    alert('Une erreur s\'est produite');
+                });
             } else if(this.hasTheUser === 'disliked') {
-                console.log('hastheuser disliked');
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -306,9 +265,11 @@ export default {
                         messagePlace.innerText = '';
                     }
                 })
-                .catch(err => console.log('Error dislikeClicked', err));
+                .catch(err => {
+                    console.log('Error dislikeClicked', err);
+                    alert('Une erreur s\'est produite');
+                });
             } else {
-                console.log('else, error');
                 const messagePlace = document.getElementById('likeErrorMessage');
                 messagePlace.innerText = 'Vous ne pouvez pas disliker cette publication.';
             }
@@ -334,6 +295,7 @@ export default {
                 data.append('json', JSON.stringify(modifiedPost));
                 fetch(`http://localhost:3000/api/posts/${this.postId}`, {
                     method: 'PUT',
+                    credentials: 'include',
                     headers: {
                     "Accept": "application/json",
                     },
@@ -349,10 +311,14 @@ export default {
                         this.modifyClicked = false;
                     }
                 })
-                .catch(err => console.log('Error modifyPost', err))
+                .catch(err => {
+                    console.log('Error modifyPost', err);
+                    alert('Une erreur s\'est produite');
+                })
             } else {
                 fetch(`http://localhost:3000/api/posts/${this.postId}`, {
                     method: 'PUT',
+                    credentials: 'include',
                     headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -369,12 +335,16 @@ export default {
                         this.modifyClicked = false;
                     }
                 })
-                .catch(err => console.log('Error modifyPost', err))
+                .catch(err => {
+                    console.log('Error modifyPost', err);
+                    alert('Une erreur s\'est produite');
+                })
             }
         },
         deletePost() {
             fetch(`http://localhost:3000/api/posts/${this.postId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                credentials: 'include'
             })
             .then(res => res.json())
                 .then(result => {
@@ -382,24 +352,27 @@ export default {
                         alert('Une erreur s\'est produite');
                     } else {
                         alert('La publication a bien été supprimée!')
-                        this.$forceUpdate();
+                        this.$router.push('posts');
                     }
                 })
-            .catch(err => console.log('Error deletePost', err));
+            .catch(err => {
+                console.log('Error deletePost', err);
+                alert('Une erreur s\'est produite');
+            });
         },
         modConditions() {
             const currentUserId = JSON.parse(localStorage.getItem('currentUserId'));
             if(currentUserId == this.userId && this.postModConditions) {
-                console.log('buttons affichés');
                 return this.displayButtons = true;
             } else {
-                console.log('buttons pas affichés');
                 return this.displayButtons = false;
             }
         },
         modConditionsAndAdmin() {
             const currentUserId = JSON.parse(localStorage.getItem('currentUserId'));
-            fetch(`http://localhost:3000/api/users/${currentUserId}`)
+            fetch(`http://localhost:3000/api/users/${currentUserId}`, {
+                credentials: 'include'
+            })
             .then(res => res.json())
             .then(result => {
                 if(parseInt(result.admin.data[0], 10) && this.postModConditions) {
@@ -408,32 +381,11 @@ export default {
                     return this.displayButtonsAdmin = false;
                 }
             })
-            .catch(err => console.log('Error ModConditionsAndAdmin', err));
-        },
-        /*mounted() {
-            this.loadData();
-        },
-        loadData() {
-            Promise.all([
-                this.loadLikeList(),
-                this.loadDislikeList()
-            ])
-            .then(values => {
-                this.likeList = values[0];
-                this.dislikeList = values[1];
-            })
-            .catch(error => console.log('Error loadData', error))
-        },
-        loadLikeList() {
-            return fetch(`http://localhost:3000/api/posts/${this.postId}`)
-            .then(res => res.json())
-            .then(result => result[0].usersLike)
-        },
-        loadDislikeList() {
-            return fetch(`http://localhost:3000/api/posts/${this.postId}`)
-            .then(res => res.json())
-            .then(result => result[0].usersDislike)
-        }*/
+            .catch(err => {
+                console.log('Error ModConditionsAndAdmin', err);
+                alert('Une erreur s\'est produite');
+            });
+        }
     }
 }
 </script>

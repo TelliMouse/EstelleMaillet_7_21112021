@@ -39,7 +39,7 @@ exports.createPost = (req, res, next) => {
 exports.modifyPost = (req, res, next) => {
     if(req.file) {
         sql.query(`SELECT * FROM post WHERE id = ${req.params.id}`, (error, result) => {
-            if(error) res.status(500).json({ error });
+            if(error) return res.status(500).json({ error });
             const filename = result[0].imageUrl.split('/images/')[1];
             fs.unlink(`images/${filename}`, () => {
                 const postObject = {
@@ -65,7 +65,7 @@ exports.modifyPost = (req, res, next) => {
 //Delete post from database, and when there is a file linked to the post, it is deleted from the related directory with fs.unlink
 exports.deletePost = (req, res, next) => {
     sql.query(`SELECT * FROM post WHERE id = ${req.params.id}`, (error, result) => {
-        if(error) res.status(500).json({ error });
+        if(error) return res.status(500).json({ error });
         if(result[0].imageUrl) {
             const filename = result[0].imageUrl.split('/images/')[1];
             fs.unlink(`images/${filename}`, () => {
@@ -88,7 +88,7 @@ exports.deletePost = (req, res, next) => {
 //Update the post in the database to increase or decrease the count of like/dislike and modify the array of user ID which liked/disliked the post
 exports.likePost = (req, res, next) => {
     sql.query(`SELECT * FROM post WHERE id = ${req.params.id}`, (error, result) => {
-        if(error) res.status(400).json({ error });
+        if(error) return res.status(400).json({ error });
 
         let likesList = [];
         let dislikesList = [];
@@ -153,8 +153,8 @@ exports.likePost = (req, res, next) => {
                 usersLike: JSON.stringify(likesList)
             }
             sql.query(`UPDATE post SET ? WHERE id = ${req.params.id}`, postObject, (error, result) => {
-                if(error) res.status(400).json({ error });
-                res.status(200).json({message: 'Post successfully liked!'});
+                if(error) return res.status(400).json({ error });
+                return res.status(200).json({message: 'Post successfully liked!'});
             })
          //If the user disliked and hasn't already liked or disliked, we update the number of dislikes, and the array of user ID which disliked
         } else if(req.body.like === -1 && !hasTheUserAlreadyLikedOrDisliked()) {
@@ -166,8 +166,8 @@ exports.likePost = (req, res, next) => {
                 usersDislike: JSON.stringify(dislikesList)
             }
             sql.query(`UPDATE post SET ? WHERE id = ${req.params.id}`, postObject, (error, result) => {
-                if(error) res.status(400).json({ error });
-                res.status(200).json({message: 'Post successfully disliked!'});
+                if(error) return res.status(400).json({ error });
+                return res.status(200).json({message: 'Post successfully disliked!'});
             })
         //If the user resets their like/dislike and has already liked, we update the number of likes, and the array of user ID which liked
         } else if(req.body.like === 0 & hasTheUserAlreadyLikedOrDisliked() === 'likes') {
@@ -180,8 +180,8 @@ exports.likePost = (req, res, next) => {
                 usersLike: JSON.stringify(likesList)
             }
             sql.query(`UPDATE post SET ? WHERE id = ${req.params.id}`, postObject, (error, result) => {
-                if(error) res.status(400).json({ error });
-                res.status(200).json({message: 'Post successfully unliked!'});
+                if(error) return res.status(400).json({ error });
+                return res.status(200).json({message: 'Post successfully unliked!'});
             })
         //If the user resets their like/dislike and has already disliked, we update the number of dislikes, and the array of user ID which disliked
         } else if(req.body.like === 0 && hasTheUserAlreadyLikedOrDisliked() === 'dislikes') {
@@ -194,8 +194,8 @@ exports.likePost = (req, res, next) => {
                 usersDislike: JSON.stringify(dislikesList)
             }
             sql.query(`UPDATE post SET ? WHERE id = ${req.params.id}`, postObject, (error, result) => {
-                if(error) res.status(400).json({ error });
-                res.status(200).json({message: 'Post successfully undisliked!'});
+                if(error) return res.status(400).json({ error });
+                return res.status(200).json({message: 'Post successfully undisliked!'});
             })
         } else {
             console.log('else');
@@ -208,8 +208,8 @@ exports.likePost = (req, res, next) => {
 //Return a specific post from its ID
 exports.getOnePost = (req, res, next) => {
     sql.query(`SELECT * FROM post WHERE id = ${req.params.id}`, (error, result) => {
-        if(error) res.status(404).json({ error });
-        res.status(200).json(result);
+        if(error) return res.status(404).json({ error });
+        return res.status(200).json(result);
     })
 };
 
@@ -225,7 +225,7 @@ exports.getAllPosts = (req, res, next) => {
 exports.getAllCommentsFromPost = (req, res, next) => {
     //select * from comment where post_id = req.params.id
     sql.query(`SELECT * FROM comment WHERE post_id = ${req.params.id} ORDER BY date ASC`, (error, result) => {
-        if(error) res.status(500).json({ error });
-        res.status(200).json(result);
+        if(error) return res.status(500).json({ error });
+        return res.status(200).json(result);
     })
 };

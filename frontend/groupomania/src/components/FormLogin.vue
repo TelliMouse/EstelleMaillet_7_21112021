@@ -53,9 +53,7 @@ export default {
                 //res is a promise, and on this iteration, if you don't use twice .then(), result.id is undefined because res will be pending
                 .then(res => res.json())
                 .then(result => {
-                    console.log('result: ', result);
                     const userId = result.id;
-                    console.log('userId: ', userId);
                     if(userId) {
                         localStorage.setItem('currentUserId', userId);
 
@@ -64,7 +62,10 @@ export default {
                         alert('Une erreur s\'est produite');
                     }
                 })
-                .catch(err => console.log('Error loginUser', err));
+                .catch(err => {
+                    console.log('Error loginUser', err);
+                    alert('Une erreur s\'est produite');
+                });
             } else {
                 alert('Veuillez remplir tous les champs de saisie!');
             }

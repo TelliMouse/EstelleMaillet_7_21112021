@@ -23,7 +23,9 @@ export default {
     methods: {
         getUserName() {
             const userId = parseInt(localStorage.getItem('currentUserId'), 10)
-            fetch(`http://localhost:3000/api/users/${userId}`)
+            fetch(`http://localhost:3000/api/users/${userId}`, {
+                credentials: 'include'
+            })
             .then(res => res.json())
             .then(result => {
                 const firstname = result.firstname;
@@ -31,16 +33,19 @@ export default {
                 this.loadName = true;
                 return this.userName = firstname + ' ' + lastname;
             })
-            .catch(err => console.log('Error getUserName', err));
+            .catch(err => {
+                console.log('Error getUserName', err);
+                alert('Une erreur s\'est produite');
+            });
         },
         publishComment() {
             const currentUserId = JSON.parse(localStorage.getItem('currentUserId'));
             const date = new Date(Date.now());
             const commentDate = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + 'T' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
-            console.log('commentdate: ', commentDate);
 
             fetch(`http://localhost:3000/api/comments`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -68,7 +73,10 @@ export default {
                     this.comment = '';
                 }
             })
-            .catch(err => console.log('Error publishComment', err));
+            .catch(err => {
+                console.log('Error publishComment', err);
+                alert('Une erreur s\'est produite');
+            });
         }
     }
 }

@@ -38,14 +38,19 @@ export default {
     },
     methods: {
         getNumberOfPosts() {
-            fetch('http://localhost:3000/api/posts')
+            fetch('http://localhost:3000/api/posts', {
+                credentials: 'include'
+            })
             .then(res => res.json())
             .then(result => {
                 this.loadNumPost = true;
                 const parsedResult = JSON.parse(result);
                 return parsedResult.length;
             })
-            .catch(err => console.log('Error getNumberOfPosts', err));
+            .catch(err => {
+                console.log('Error getNumberOfPosts', err);
+                alert('Une erreur s\'est produite');
+            });
         },
         getNumberOfPages() {
             const post = this.numberOfPosts;
@@ -58,13 +63,12 @@ export default {
             }
         },
         getCurrentPage() {
-            const url = window.location.href;
-            const urlParams = new URLSearchParams(url);
+            const page = this.$route.query.page;
 
-            if(!urlParams.get('page')) {
+            if(!page) {
                 return 1;
             } else {
-                return parseInt(urlParams.get('page'), 10);
+                return parseInt(page, 10);
             }
         },
         isThereAPreviousPage() {

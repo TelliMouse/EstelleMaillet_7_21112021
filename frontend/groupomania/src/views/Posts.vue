@@ -52,37 +52,21 @@ export default {
                 return false;
             }
         },
-        /*getUsers() {
-            fetch('http://localhost:3000/api/users')
-            .then(res => res.json())
-            .then(result => {
-                this.users = result;
-                console.log('getUsers result', result)
-            })
-            .catch(err => console.log('Error getUsers', err));
-        },*/
         getUserName(userId) {
-            //console.log('getUserName');
-            fetch(`http://localhost:3000/api/users/${userId}`)
+            fetch(`http://localhost:3000/api/users/${userId}`, {
+                credentials: 'include'
+            })
             .then(res => res.json())
             .then(result => {
-                //const users = [];
                 const firstname = result.firstname;
                 const lastname = result.lastname;
-                //console.log(firstname, lastname);
-                //this.users = firstname + ' ' + lastname;
                 this.nameLoaded = true;
                 return firstname + ' ' + lastname;
             })
-            .catch(err => console.log('Error getUserName', err));
-            //const userList = this.users;
-            //console.log('getusername userlist', userList)
-            /*console.log('users befor iteration: ', this.users);
-            for(let user of this.users) {
-                if(user.id == userId) {
-                    return user.firstname + ' ' + user.lastname
-                }
-            }*/
+            .catch(err => {
+                console.log('Error getUserName', err);
+                alert('Une erreur s\'est produite');
+                });
         },
         getDate(date) {
             //"yyyy-mm-ddThh:mm:ss.000Z"
@@ -117,17 +101,18 @@ export default {
             return day + ' ' + month + ' ' + year + ', ' + hour + 'h' + minutes + 'm' + seconds + 's';
         },
         getCurrentPage() {
-            const url = window.location.href;
-            const urlParams = new URLSearchParams(url);
+            const page = this.$route.query.page;
 
-            if(!urlParams.get('page')) {
+            if(!page) {
                 return 1;
             } else {
-                return parseInt(urlParams.get('page'), 10);
+                return parseInt(page, 10);
             }
         },
         getPostList() {
-            fetch('http://localhost:3000/api/posts')
+            fetch('http://localhost:3000/api/posts', {
+                credentials: 'include'
+            })
             .then(res => res.json())
             .then(result => {
                 let postList = [];
@@ -144,7 +129,10 @@ export default {
                 this.loadList = true;
                 return this.postList = result;
             })
-            .catch(err => console.log('Error getPostList', err));
+            .catch(err => {
+                console.log('Error getPostList', err);
+                alert('Une erreur s\'est produite');
+                });
         }
     }
 }

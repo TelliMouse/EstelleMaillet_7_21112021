@@ -20,11 +20,12 @@ export default {
     name: "FormSignup",
     data() {
         return {
-        firstname: '',
-        lastname: '',
-        email: '',
-        password: ''
-        };
+            firstname: '',
+            lastname: '',
+            email: '',
+            password: '',
+            userList: this.retrieveUserList()
+        }
     },
     methods: {
         /**
@@ -35,6 +36,7 @@ export default {
         createUser(user) {
             fetch('http://localhost:3000/api/users/signup', {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     "Accept": "application/json", 
                     "Content-Type": "application/json"
@@ -42,16 +44,27 @@ export default {
                 body: JSON.stringify({ ...user })
             })
             .then(res => res.json())
-            .catch(err => console.log('Error createUser', err));
+            .catch(err => {
+                console.log('Error createUser', err);
+                alert('Une erreur s\'est produite. Veillez à n\'utiliser qu\'une seule fois votre email');
+            });
         },
         /**
          * Retrieve the list of all users
          * @returns {Json} res.json() -array of all users-
          */
         retrieveUserList() {
-            fetch('http://localhost:3000/api/users')
+            fetch('http://localhost:3000/api/users', {
+                credentials: "include"
+            })
             .then(res => res.json())
-            .catch(err => console.log('Error retrieveUserList', err));
+            .then(result => {
+                this.userList = result;
+            })
+            .catch(err => {
+                console.log('Error retrieveUserList', err);
+                alert('Une erreur s\'est produite');
+            });
         },
         /**
          * Verifies if all field of the form are complete
@@ -69,9 +82,8 @@ export default {
          * @returns {Boolean}
          */
         isTheEmailUnique() {
-            const userList = this.retrieveUserList();
-            if(userList) {
-                for(let user of userList) {
+            if(this.userList) {
+                for(let user of this.userList) {
                     if(user.email === this.email) {
                         return false;
                     }
@@ -103,12 +115,15 @@ export default {
                 const userId = result.id;
                 if(userId) {
                     localStorage.setItem('currentUserId', userId);
-                    this.$router.push({ name: 'Posts'});
+                    this.$router.push('posts');
                 } else {
                     alert('Une erreur s\'est produite');
                 }
             })
-            .catch(err => console.log('Error loginUser', err));
+            .catch(err => {
+                console.log('Error loginUser', err);
+                alert('Une erreur s\'est produite');
+            });
         },
         /**
          * Create a new user in the database, then authentifies them with login() (see previous function)
@@ -121,8 +136,21 @@ export default {
                     email: this.email,
                     password: this.password
                 };
-                this.createUser(user);
-                this.login(user);
+                fetch('http://localhost:3000/api/users/signup', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        "Accept": "application/json", 
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ ...user })
+                })
+                .then(res => res.json())
+                .then(() => this.login(user))
+                .catch(err => {
+                    console.log('Error createUser', err);
+                    alert('Une erreur s\'est produite. Veillez à n\'utiliser qu\'une seule fois votre email');
+                });
             } else {
                 alert('Veuillez remplir tous les champs du formulaire et n\'avoir utilisé qu\'une fois votre email');
             }

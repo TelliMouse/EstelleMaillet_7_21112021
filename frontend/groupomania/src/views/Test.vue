@@ -68,6 +68,7 @@ export default {
             }
         },
         getDate(date) {
+            //console.log('params: ', this.$router.query.id);
             console.log('date:', date)
             //"yyyy-mm-ddThh:mm:ss.000Z"
             const firstSplit = date.split('-'); //['yyyy', 'mm', 'ddThh:mm:ss.000Z']
@@ -110,12 +111,11 @@ export default {
             return day + ' ' + month + ' ' + year + ', ' + hour + 'h' + minutes + 'm' + seconds + 's';
         },
         getPost() {
-            //const url = window.location.href;
-            //const urlParams = new URLSearchParams(url);
-            //const postId = urlParams.get('id');
-            const postId = 10;
+            const postId = this.$route.query.id;
 
-            fetch(`http://localhost:3000/api/posts/${postId}`)
+            fetch(`http://localhost:3000/api/posts/${postId}`, {
+                credentials: 'include'
+            })
             .then(res => res.json())
             .then(result => {
                 console.log('res getpost', result);
@@ -128,9 +128,11 @@ export default {
             //const url = window.location.href;
             //const urlParams = new URLSearchParams(url);
             //const postId = urlParams.get('id');
-            const postId = 10;
+            const postId = 15;
 
-            fetch(`http://localhost:3000/api/posts/${postId}/comments`)
+            fetch(`http://localhost:3000/api/posts/${postId}/comments`, {
+                credentials: 'include'
+            })
             .then(res => res.json())
             .then(result => {
                 this.commentLoaded = true;
