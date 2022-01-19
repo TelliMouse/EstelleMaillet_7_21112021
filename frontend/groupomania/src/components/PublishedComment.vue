@@ -4,17 +4,19 @@
         <p v-if="!modifyClicked">{{ comment }}</p>
         <textarea v-if="modifyClicked" name="textarea" v-model="comment"></textarea>
         <div>
-            <div>
-                <button @click="likeClicked"><fa icon="thumbs-up" v-if="liked" alt="Icone de like"/><fa icon="thumbs-up" v-if="!liked" alt="Icone de like"/> {{ shownLikeNumber }}</button>
-                <button @click="dislikeClicked"><fa icon="thumbs-down" v-if="disliked" alt="Icone de dislike"/><fa icon="thumbs-down" v-if="!disliked" alt="Icone de dislike"/> {{ shownDislikeNumber }}</button>
+            <div v-if="likesChecked">
+                <button @click="likeClicked" v-if="liked" class="liked"><fa icon="thumbs-up" alt="Icone de like"/>{{ shownLikeNumber }}</button>
+                <button @click="likeClicked" v-if="!liked" class="not-liked"><fa icon="thumbs-up" alt="Icone de like"/>{{ shownLikeNumber }}</button>
+                <button @click="dislikeClicked" v-if="disliked" class="liked"><fa icon="thumbs-down" alt="Icone de dislike"/>{{ shownDislikeNumber }}</button>
+                <button @click="dislikeClicked" v-if="!disliked" class="not-liked"><fa icon="thumbs-down" alt="Icone de dislike"/> {{ shownDislikeNumber }}</button>
             </div>
             <p>{{ date }}</p>
         </div>
         <p id="likeErrorMessageComment"></p>
         <button v-if="modifyClicked" @click="modifyComment">Publier</button>
         <div>
-            <button v-if="modConditions" @click="modifyButton">Modifier</button>
-            <button v-if="modConditions || modConditionsAndAdmin" @click="deleteComment">Supprimer</button>
+            <button v-if="displayButtons" @click="modifyButton">Modifier</button>
+            <button v-if="displayButtons || displayButtonsAdmin" @click="deleteComment">Supprimer</button>
             <input/>
         </div>
     </div>
@@ -34,14 +36,16 @@ export default {
     data() {
         return {
             comment: this.propComment,
-            liked: this.isLiked(),
-            disliked: this.isDisliked(),
+            liked: this.hasTheUserAlreadyLiked(),
+            disliked: false,
             modifyClicked: false,
             shownLikeNumber: this.likeNumber,
             shownDislikeNumber: this.dislikeNumber,
             userName: this.getUserName(this.userId),
             loadName: false,
-            hasTheUser: this.hasTheUserAlreadyLiked()
+            displayButtons: this.modConditions(),
+            displayButtonsAdmin: this.modConditionsAndAdmin(),
+            likesChecked: false,
         }
     },
     methods: {
@@ -73,7 +77,8 @@ export default {
                 if(likeList != []) {
                     for(let userId of likeList) {
                         if(currentUserId == userId) {
-                            return this.hasTheUser = 'liked';
+                            this.likesChecked = true;
+                            return this.liked = true;
                         }
                     }
                 }
@@ -81,35 +86,23 @@ export default {
                 if(dislikeList != []) {
                     for(let userId of dislikeList) {
                         if(currentUserId == userId) {
-                            return this.hasTheUser = 'disliked';
+                            this.likesChecked = true;
+                            return this.disliked = true;
                         }
                     }
                 }
 
-                return this.hasTheUser = false
+                this.likesChecked = true;
+                return this.liked = false;
             
             })
             .catch(error => {
                 console.log('Error hasTheUserAlreadyLiked', error);
                 alert('Une erreur s\'est produite');
-                })
-        },
-        isLiked() {
-            if(this.hasTheUser === 'liked') {
-                return this.liked = true;
-            } else {
-                return this.liked = false;
-            }
-        },
-        isDisliked() {
-            if(this.hasTheUser === 'disliked') {
-                return this.disliked = true;
-            } else {
-                return this.disliked = false;
-            }
+            })
         },
         likeClicked() {
-            if(this.hasTheUser === false) {
+            if(!this.liked && !this.disliked) {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
                     method: 'POST',
                     credentials: 'include',
@@ -125,21 +118,21 @@ export default {
                 .then(res => res.json())
                 .then(result => {
                     if(result == {message: 'The user cannot like/dislike the post'}) {
-                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        const messagePlace = document.getElementById('likeErrorMessage');
                         messagePlace.innerText = 'Vous ne pouvez pas liker cette publication.';
                     } else {
                         this.shownLikeNumber++;
                         this.liked = true;
                         this.hasTheUser = 'liked';
-                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        const messagePlace = document.getElementById('likeErrorMessage');
                         messagePlace.innerText = '';
                     }
                 })
                 .catch(err => {
                     console.log('Error likeClicked', err);
                     alert('Une erreur s\'est produite');
-                    });
-            } else if(this.hasTheUser === 'liked') {
+                });
+            } else if(this.liked && !this.disliked) {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
                     method: 'POST',
                     credentials: 'include',
@@ -155,27 +148,27 @@ export default {
                 .then(res => res.json())
                 .then(result => {
                     if(result == {message: 'The user cannot like/dislike the post'}) {
-                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        const messagePlace = document.getElementById('likeErrorMessage');
                         messagePlace.innerText = 'Vous ne pouvez pas déliker cette publication.';
                     } else {
                         this.shownLikeNumber--;
                         this.liked = false;
                         this.hasTheUser = false;
-                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        const messagePlace = document.getElementById('likeErrorMessage');
                         messagePlace.innerText = '';
                     }
                 })
                 .catch(err => {
                     console.log('Error likeClicked', err);
                     alert('Une erreur s\'est produite');
-                    });
+                });
             } else {
-                const messagePlace = document.getElementById('likeErrorMessageComment');
-                messagePlace.innerText = 'Vous ne pouvez pas liker ce commentaire.'
+                const messagePlace = document.getElementById('likeErrorMessage');
+                messagePlace.innerText = 'Vous ne pouvez pas liker cette publication.';
             }
         },
         dislikeClicked() {
-            if(this.hasTheUser === false) {
+            if(!this.liked && !this.disliked) {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
                     method: 'POST',
                     credentials: 'include',
@@ -191,21 +184,21 @@ export default {
                 .then(res => res.json())
                 .then(result => {
                     if(result == {message: 'The user cannot like/dislike the post'}) {
-                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        const messagePlace = document.getElementById('likeErrorMessage');
                         messagePlace.innerText = 'Vous ne pouvez pas disliker cette publication.';
                     } else {
                         this.shownDislikeNumber++;
                         this.disliked = true;
                         this.hasTheUser = 'disliked';
-                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        const messagePlace = document.getElementById('likeErrorMessage');
                         messagePlace.innerText = '';
                     }
                 })
                 .catch(err => {
                     console.log('Error dislikeClicked', err);
                     alert('Une erreur s\'est produite');
-                    });
-            } else if(this.hasTheUser === 'disliked') {
+                });
+            } else if(this.disliked && !this.liked) {
                 fetch(`http://localhost:3000/api/comments/${this.commentId}/like`, {
                     method: 'POST',
                     credentials: 'include',
@@ -221,23 +214,23 @@ export default {
                 .then(res => res.json())
                 .then(result => {
                     if(result == {message: 'The user cannot like/dislike the post'}) {
-                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        const messagePlace = document.getElementById('likeErrorMessage');
                         messagePlace.innerText = 'Vous ne pouvez pas dédisliker cette publication.';
                     } else {
                         this.shownDislikeNumber--;
                         this.disliked = false;
                         this.hasTheUser = false;
-                        const messagePlace = document.getElementById('likeErrorMessageComment');
+                        const messagePlace = document.getElementById('likeErrorMessage');
                         messagePlace.innerText = '';
                     }
                 })
                 .catch(err => {
                     console.log('Error dislikeClicked', err);
                     alert('Une erreur s\'est produite');
-                    });
+                });
             } else {
-                const messagePlace = document.getElementById('likeErrorMessageComment');
-                messagePlace.innerText = 'Vous ne pouvez pas disliker ce commentaire.'
+                const messagePlace = document.getElementById('likeErrorMessage');
+                messagePlace.innerText = 'Vous ne pouvez pas disliker cette publication.';
             }
         },
         modifyButton() {
@@ -288,9 +281,11 @@ export default {
         modConditions() {
             const currentUserId = JSON.parse(localStorage.getItem('currentUserId'));
             if(currentUserId == this.userId) {
-                return true;
+                console.log('modcond true');
+                return this.displayButtons = true;
             } else {
-                return false;
+                console.log('modcond false');
+                return this.displayButtons = false;
             }
         },
         modConditionsAndAdmin() {
@@ -298,12 +293,12 @@ export default {
             fetch(`http://localhost:3000/api/users/${currentUserId}`, {
                 credentials: 'include'
             })
-            .then(res => {
-                const result = JSON.parse(res.json());
-                if(result.admin) {
-                    return true;
+            .then(res => res.json())
+            .then(result => {
+                if(parseInt(result.admin.data[0], 10)) {
+                    return this.displayButtonsAdmin = true;
                 } else {
-                    return false;
+                    return this.displayButtonsAdmin = false;
                 }
             })
             .catch(err => {
@@ -316,5 +311,7 @@ export default {
 </script>
 
 <style>
-
+.liked {
+    background-color: blueviolet;
+}
 </style>

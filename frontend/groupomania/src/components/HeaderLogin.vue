@@ -23,7 +23,7 @@ export default {
 
 <style lang="scss">
 header {
-    background-color: #002626;
+    background-color: #4C061D;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -38,7 +38,7 @@ header {
         justify-content: space-between;
         &>a {
             text-decoration: none;
-            color: #FFD7D7;
+            color: white;
         }
     }
 }

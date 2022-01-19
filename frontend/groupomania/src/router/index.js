@@ -37,18 +37,18 @@ const routes = [
     name: 'Posts',
     component: Posts
   },
-  {
+  /*{
     path: '/posts?page=:page?',
     name: 'PostsPage',
     component: Posts
-  },
+  },*/
   {
     path: '/newpost',
     name: 'NewPost',
     component: NewPost
   },
   {
-    path: '/post?id=:id',
+    path: '/post',
     name: 'Post',
     component: Post
   },

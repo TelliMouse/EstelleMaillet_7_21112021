@@ -16,7 +16,7 @@
         <input v-if="imagePost && modifyClicked" type="text" name="image" id="changeImageUrl" placeholder="Exemple: Photographie d'une colline verdoyante devant un ciel bleu sans nuage" v-model="modelImageAlt"/>
         <p v-if="imagePost && modifyClicked">Avoir des textes alternatifs pour vos images permet d'avoir un contenu plus accessible pour les personnes malvoyantes</p>
         <div class="like-date">
-            <div>
+            <div v-if="likesChecked">
                 <button @click="likeClicked" v-if="liked" class="liked"><fa icon="thumbs-up" alt="Icone de like"/>{{ shownLikeNumber }}</button>
                 <button @click="likeClicked" v-if="!liked" class="not-liked"><fa icon="thumbs-up" alt="Icone de like"/>{{ shownLikeNumber }}</button>
                 <button @click="dislikeClicked" v-if="disliked" class="liked"><fa icon="thumbs-down" alt="Icone de dislike"/>{{ shownDislikeNumber }}</button>
@@ -30,7 +30,7 @@
             <button v-if="displayButtons" @click="modifyButton">Modifier</button>
             <button v-if="displayButtons || displayButtonsAdmin" @click="deletePost">Supprimer</button>
         </div>
-        <router-link :to="{ name: 'Post', params: { id: postId}}" v-if="needLinkToPost">Voir la publication</router-link>
+        <router-link :to="{ name: 'Post', query: { id: postId } }" v-if="needLinkToPost">Voir la publication</router-link>
     </div>
 </template>
 
@@ -63,18 +63,18 @@ export default {
             modelTitle: this.postTitle,
             modelPost: this.post,
             modelImageAlt: this.imageAlt,
-            liked: this.isLiked(),
-            disliked: this.isDisliked(),
+            liked: this.hasTheUserAlreadyLiked(),
+            disliked: false,
             needLinkToPost: this.postNeedLinkToPost,
             shownLikeNumber: this.likeNumber,
             shownDislikeNumber: this.dislikeNumber,
-            likeList: [], //this.getLikeList(),
-            dislikeList: [], //this.getDislikeList()
-            hasTheUser: this.hasTheUserAlreadyLiked(),
+            likeList: [],
+            dislikeList: [],
             displayButtons: this.modConditions(),
             displayButtonsAdmin: this.modConditionsAndAdmin(),
             userName: this.getUserName(this.userId),
-            loadName: false
+            loadName: false,
+            likesChecked: false
         }
     },
     methods: {
@@ -95,6 +95,7 @@ export default {
                 });
         },
         hasTheUserAlreadyLiked() {
+            console.log('hastheuser begin');
             const currentUserId = localStorage.getItem('currentUserId');
 
             fetch(`http://localhost:3000/api/posts/${this.postId}`, {
@@ -102,12 +103,15 @@ export default {
             })
             .then(res => res.json())
             .then(result => {
+                console.log('hastheuser then');
                 const likeList = result[0].usersLike;
                 const dislikeList = result[0].usersDislike;
                 if(likeList != []) {
                     for(let userId of likeList) {
                         if(currentUserId == userId) {
-                            return this.hasTheUser = 'liked';
+                            console.log('hastheuser liked');
+                            this.likesChecked = true;
+                            return this.liked = true;
                         }
                     }
                 }
@@ -115,12 +119,16 @@ export default {
                 if(dislikeList != []) {
                     for(let userId of dislikeList) {
                         if(currentUserId == userId) {
-                            return this.hasTheUser = 'disliked';
+                            console.log('hastheuser disliked');
+                            this.likesChecked = true;
+                            return this.disliked = true;
                         }
                     }
                 }
 
-                return this.hasTheUser = false
+                console.log('hastheuser false');
+                this.likesChecked = true;
+                return this.liked = false;
             
             })
             .catch(error => {
@@ -128,22 +136,8 @@ export default {
                 alert('Une erreur s\'est produite');
             })
         },
-        isLiked() {
-            if(this.hasTheUser === 'liked') {
-                return this.liked = true;
-            } else {
-                return this.liked = false;
-            }
-        },
-        isDisliked() {
-            if(this.hasTheUser === 'disliked') {
-                return this.disliked = true;
-            } else {
-                return this.disliked = false;
-            }
-        },
         likeClicked() {
-            if(this.hasTheUser === false) {
+            if(!this.liked && !this.disliked) {
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
                     credentials: 'include',
@@ -173,7 +167,7 @@ export default {
                     console.log('Error likeClicked', err);
                     alert('Une erreur s\'est produite');
                 });
-            } else if(this.hasTheUser === 'liked') {
+            } else if(this.liked && !this.disliked) {
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
                     credentials: 'include',
@@ -209,7 +203,7 @@ export default {
             }
         },
         dislikeClicked() {
-            if(this.hasTheUser === false) {
+            if(!this.liked && !this.disliked) {
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
                     credentials: 'include',
@@ -239,7 +233,7 @@ export default {
                     console.log('Error dislikeClicked', err);
                     alert('Une erreur s\'est produite');
                 });
-            } else if(this.hasTheUser === 'disliked') {
+            } else if(this.disliked && !this.liked) {
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
                     credentials: 'include',
@@ -394,7 +388,7 @@ export default {
 div.published-post {
     display: flex;
     flex-direction: column;
-    background-color: #FFD7D7;
+    background-color: #D3F6DB;
     border-radius: 15px/15px;
     margin-bottom: 2em;
     padding: 1em 0.75em 1.5em 0.75em;
@@ -405,18 +399,18 @@ div.published-post {
     }
     &>p.post-text {
         background-color: white;
-        border: #002626 solid 2px;
+        border: #92D5E6 solid 2px;
         width: 95%;
         white-space: pre-wrap;
         padding: 0.75em 0.5em;
         align-self: center;
     }
     &>h2 {
-        color: #002626;
+        color: #4C061D;
     }
     &>img {
         width: 95%;
-        border: #002626 solid 3px;
+        border: #92D5E6 solid 3px;
         align-self: center;
     }
     &>div.like-date {
@@ -432,17 +426,17 @@ div.published-post {
             &>button{
                 align-self: center;
                 border-radius: 15px/15px;
-                border: #002626 solid 1px;
+                border: #92D5E6 solid 1px;
                 box-shadow: 2px 2px 3px #0E4749;
                 padding: 0.25em 0.5em;
                 margin-right: 0.25em;
                 &.liked {
-                    background-color: #002626;
-                    color: white;
+                    background-color: #A1EF8B;
+                    color: black;
                 }
                 &.not-liked {
                     background-color: white;
-                    color: #002626;
+                    color: black;
                 }
                 
             }

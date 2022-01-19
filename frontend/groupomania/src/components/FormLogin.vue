@@ -79,7 +79,7 @@ export default {
 div.form-login {
     display: flex;
     flex-direction: column;
-    background-color: #FFD7D7;
+    background-color: #D3F6DB;
     width: 85%;
     margin-top: 2em;
     border-radius: 15px/15px;
@@ -95,23 +95,23 @@ div.form-login {
     }
     &>input {
         border-radius: 15px/15px;
-        border: 2px solid #002626;
+        border: 2px solid #92D5E6;
     }
     &>button {
         margin-top: 1em;
         width: 20%;
         align-self: center;
         color: white;
-        background-color: #002626;
+        background-color: #4C061D;
         border-radius: 15px/15px;
         border: none;
         padding-top: 0.5em;
         padding-bottom: 0.5em;
-        box-shadow: 2px 2px 3px #0E4749;
+        box-shadow: 2px 2px 3px #11020F;
     }
     &>a {
         text-decoration: none;
-        color: #002626;
+        color: #4C061D;
         align-self: center;
         margin-top: 1em;
     }

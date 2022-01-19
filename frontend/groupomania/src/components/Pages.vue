@@ -1,21 +1,21 @@
 <template>
     <div v-if="loadNumPost">
-        <div v-if="isThereAPreviousPage">
+        <div v-if="existingPreviousPage">
             <router-link to="/posts">
                 <fa icon="fast-backward" alt="Icone double flèche vers la gauche" />
                 <p>Première page</p>
             </router-link>
-            <router-link :to="previousPageLink">
+            <router-link :to="{ name: 'Posts', query: { page: previousPage } }">
                 <fa icon="arrow-circle-left" alt="Icone de flèche vers la gauche"/>
                 <p>Page précèdente</p>
             </router-link>
         </div>
-        <div  v-if="isThereANextPage">
-            <router-link :to="nextPageLink">
+        <div  v-if="existingNextPage">
+            <router-link :to="{ name: 'Posts', query: { page: nextPage } }">
                 <fa icon="arrow-circle-right" alt="Icone de flèche vers la droite"/>
                 <p>Page suivante</p>
             </router-link>
-            <router-link :to="lastPageLink">
+            <router-link :to="{ name: 'Posts', query: { page: lastPage } }">
                 <fa icon="fast-forward" alt="Icon double flèche vers la droite" />
                 <p>Dernière page</p>
             </router-link>
@@ -29,23 +29,27 @@ export default {
     data() {
         return {
             currentPage: this.getCurrentPage(),
-            previousPageLink: this.getPreviousPageLink(),
-            nextPageLink: this.getNextPageLink(),
-            lastPageLink: this.getLastPageLink(),
             loadNumPost: false,
-
+            numberOfPosts: this.getNumberOfPosts(),
+            numberOfPages: this.getNumberOfPages(),
+            previousPage: this.getPreviousPageLink(),
+            nextPage: this.getNextPageLink(),
+            lastPage: this.getLastPageLink(),
+            existingPreviousPage: this.isThereAPreviousPage(),
+            existingNextPage: this.isThereANextPage()
         }
     },
     methods: {
         getNumberOfPosts() {
+            console.log('getnumpost');
             fetch('http://localhost:3000/api/posts', {
                 credentials: 'include'
             })
             .then(res => res.json())
             .then(result => {
+                console.log('loadnumpost true');
                 this.loadNumPost = true;
-                const parsedResult = JSON.parse(result);
-                return parsedResult.length;
+                return this.numberOfPosts = result.length;
             })
             .catch(err => {
                 console.log('Error getNumberOfPosts', err);
@@ -53,51 +57,63 @@ export default {
             });
         },
         getNumberOfPages() {
+            console.log('getnumpages');
             const post = this.numberOfPosts;
+            console.log('post getnumpages: ', post);
             const modulo = post%10;
+            console.log('modulo getnumpage: ', post%10);
             if(modulo === 0) {
-                return post/10;
+                console.log('modulo 0, numpage: ', post/10);
+                return this.numberOfPages = post/10;
             } else {
                 const majPost = post + 10 - modulo
-                return majPost/10;
+                console.log('modulo no0, numpage: ', majPost/10);
+                return this.numberOfPages = majPost/10;
             }
         },
         getCurrentPage() {
+            console.log('getcurrentpage');
             const page = this.$route.query.page;
 
             if(!page) {
-                return 1;
+                console.log('no query page');
+                return this.currentPage = 1;
             } else {
-                return parseInt(page, 10);
+                console.log('query page: ', parseInt(page, 10));
+                return this.currentPage = parseInt(page, 10);
             }
         },
         isThereAPreviousPage() {
-            if(this.getCurrentPage() > 1) {
-                return true;
+            console.log('isprevpage');
+            if(this.currentPage > 1) {
+                console.log('prevpage true');
+                return this.existingPreviousPage = true;
             } else {
-                return false;
+                console.log('prevpage false');
+                return this.existingPreviousPage = false;
             }
         },
         isThereANextPage() {
-            if(this.getCurrentPage() < this.getNumberOfPages()) {
-                return true;
+            console.log('isnextpage');
+            if(this.currentPage < this.numberOfPages) {
+                console.log('nextpage true');
+                return this.existingNextPage = true;
             } else {
-                return false;
+                console.log('nextpage false');
+                return this.existingNextPage = false;
             }
         },
         getPreviousPageLink() {
-            //const param = parseInt(this.currentPage, 10) - 1;
-            const param = this.getCurrentPage() - 1;
-            return `/posts?page=${param}`;
+            console.log('prevpagelink: ', this.currentPage - 1);
+            return this.previousPage = this.currentPage - 1;
         },
         getNextPageLink() {
-            //const param = this.currentPage + 1;
-            const param = this.getCurrentPage() + 1;
-            return `/posts?page=${param}`;
+            console.log('nextpagelink: ', this.currentPage + 1);
+            return this.nextPage = this.currentPage + 1;
         }   ,
         getLastPageLink() {
-            const param = this.getNumberOfPages();
-            return `/posts?page=${param}`;
+            console.log('lastpagelink: ', this.numberOfPages);
+            return this.lastPage = this.numberOfPages;
         }
     }
 }

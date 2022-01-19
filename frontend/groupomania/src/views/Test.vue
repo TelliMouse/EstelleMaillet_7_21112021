@@ -125,10 +125,7 @@ export default {
             .catch(err => console.log('Error getPost', err));
         },
         getComments() {
-            //const url = window.location.href;
-            //const urlParams = new URLSearchParams(url);
-            //const postId = urlParams.get('id');
-            const postId = 15;
+            const postId = this.$route.query.id;
 
             fetch(`http://localhost:3000/api/posts/${postId}/comments`, {
                 credentials: 'include'
