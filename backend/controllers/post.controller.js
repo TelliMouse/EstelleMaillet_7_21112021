@@ -1,9 +1,9 @@
-const Post = require('../models/Post');
 const sql = require('../db');
 const fs = require('fs');
 
 //Create post, retrieve request body and set likes and dislikes, if there is a file attached, it went through the multer middleware, so we can set the imageUrl
 exports.createPost = (req, res, next) => {
+    //The request can either contain or not an image file, so we need to treat those requests differently from each other
     if(req.file) {
         //When there is a file, the request body looks like: body: formData.append('image', image-file), .append('json', json-of-an-object)
         const postObject = JSON.parse(req.body.json);
@@ -16,7 +16,7 @@ exports.createPost = (req, res, next) => {
             usersDislike: '[]'
         }
         sql.query('INSERT INTO post SET ?', post, (error, result) => {
-            if(error) {console.log('error req file sql', error); return res.status(400).json({ error })};
+            if(error) return res.status(400).json({ error })
             return res.status(201).json({message: 'Post created!'});
         });
     } else {
@@ -34,19 +34,23 @@ exports.createPost = (req, res, next) => {
     }
 };
 
-//Should work ¯\_(ツ)_/¯
 //Modify post, retrieve new values from request and replace the old ones, if there is a file attached, it went through the multer middleware, so we can set the new imageUrl
 exports.modifyPost = (req, res, next) => {
+    //If the image of the post is modified, the request contain an image file, and need to be treated differently from an image-less request
     if(req.file) {
+        //First we need to find the post from its id
         sql.query(`SELECT * FROM post WHERE id = ${req.params.id}`, (error, result) => {
             if(error) return res.status(500).json({ error });
+            //Then we need to get the name of the file related to the post in order to delete it from the directory
             const filename = result[0].imageUrl.split('/images/')[1];
             fs.unlink(`images/${filename}`, () => {
+                //Once the original image is deleted, we create a new object with the imageUrl of the image attached in the request
                 const postObject = {
                     //When there is a file, the request body looks like: body: formData.append('image', image-file), .append('json', json-of-an-object)
                     ...JSON.parse(req.body.json),
                     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
                 }
+                //We finally update the post with the new object that has the new data
                 sql.query(`UPDATE post SET ? WHERE id = ${req.params.id}`, postObject, (error, result) => {
                     if(error) return res.status(400).json({ error });
                     return res.status(200).json({message: 'Post successfully modified!'});
@@ -66,7 +70,9 @@ exports.modifyPost = (req, res, next) => {
 exports.deletePost = (req, res, next) => {
     sql.query(`SELECT * FROM post WHERE id = ${req.params.id}`, (error, result) => {
         if(error) return res.status(500).json({ error });
+        //A post can either have a image attached to it or not, and both situation need to be treated differently
         if(result[0].imageUrl) {
+            //If the post has an image attached to it, we need to find the name of the file, deleted the image from the directory, then delete the post itslef
             const filename = result[0].imageUrl.split('/images/')[1];
             fs.unlink(`images/${filename}`, () => {
                 sql.query(`DELETE FROM post WHERE id = ${req.params.id}`, (error, result) => {
@@ -112,19 +118,17 @@ exports.likePost = (req, res, next) => {
 
         /**
          * Verify if the user has liked or disliked the post, or not
-         * @returns {Boolean | String(as a truthy value)}
+         * @returns {Boolean | String}
          */
         const hasTheUserAlreadyLikedOrDisliked = () => {
             
             if(likesList == '[]' || dislikesList == '[]') {
-                console.log('empty list');
                 return false;
             }
 
             //Return 'likes' if the user has liked
             for(let userId of likesList) {
                 if(userId === req.body.user_id) {
-                    console.log('already likes');
                     return 'likes';
                 };
             };
@@ -132,20 +136,16 @@ exports.likePost = (req, res, next) => {
             //Return 'dislikes' if the user has disliked
             for(let userId of dislikesList) {
                 if(userId === req.body.user_id) {
-                    console.log('already disliked');
                     return 'dislikes';
                 };
             };
 
-            console.log('not liked');
             return false;
         };
 
         //req.body.like can be 1 (when user likes), -1(when they dislike), or 0(when they delete their like/dislike)
         //If the user liked and hasn't already liked or disliked, we update the number of likes, and the array of user ID which liked
-        console.log('before conds, hastheuser: ', hasTheUserAlreadyLikedOrDisliked());
         if(req.body.like === 1 && !hasTheUserAlreadyLikedOrDisliked()) {
-            console.log('condition 1');
             likesList.push(req.body.user_id);
             const postObject = {
                 ...result[0],
@@ -158,7 +158,6 @@ exports.likePost = (req, res, next) => {
             })
          //If the user disliked and hasn't already liked or disliked, we update the number of dislikes, and the array of user ID which disliked
         } else if(req.body.like === -1 && !hasTheUserAlreadyLikedOrDisliked()) {
-            console.log('condition 2');
             dislikesList.push(req.body.user_id);
             const postObject = {
                 ...result[0],
@@ -171,7 +170,6 @@ exports.likePost = (req, res, next) => {
             })
         //If the user resets their like/dislike and has already liked, we update the number of likes, and the array of user ID which liked
         } else if(req.body.like === 0 & hasTheUserAlreadyLikedOrDisliked() === 'likes') {
-            console.log('condition 3');
             const index = likesList.indexOf(req.body.user_id);
             likesList.splice(index, 1);
             const postObject = {
@@ -185,7 +183,6 @@ exports.likePost = (req, res, next) => {
             })
         //If the user resets their like/dislike and has already disliked, we update the number of dislikes, and the array of user ID which disliked
         } else if(req.body.like === 0 && hasTheUserAlreadyLikedOrDisliked() === 'dislikes') {
-            console.log('condition 4');
             const index = dislikesList.indexOf(req.body.user_id);
             dislikesList.splice(index, 1);
             const postObject = {
@@ -198,8 +195,6 @@ exports.likePost = (req, res, next) => {
                 return res.status(200).json({message: 'Post successfully undisliked!'});
             })
         } else {
-            console.log('else');
-            console.log('like', req.body.like);
             return res.status(400).json({message: 'The user cannot like/dislike the post'});
         }
     })
@@ -223,7 +218,6 @@ exports.getAllPosts = (req, res, next) => {
 
 //Return all comments in ascending order from a specific post from its id
 exports.getAllCommentsFromPost = (req, res, next) => {
-    //select * from comment where post_id = req.params.id
     sql.query(`SELECT * FROM comment WHERE post_id = ${req.params.id} ORDER BY date ASC`, (error, result) => {
         if(error) return res.status(500).json({ error });
         return res.status(200).json(result);
