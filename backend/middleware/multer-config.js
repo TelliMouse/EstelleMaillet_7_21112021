@@ -10,10 +10,13 @@ const MIME_TYPES = {
     'image/svg+xml': 'svg'
 };
 
+//Middleware that treats any file attached to the request. In this instance the file is always an image
 const storage = multer.diskStorage({
+    //Directs the file to the direcrory "images"
     destination: (req, file, callback) => {
         callback(null, 'images')
     },
+    //Modifies the original filename to make it more unique to avoid errors
     filename: (req, file, callback) => {
         const name = file.originalname.split(' ').join('_');
         const extension = MIME_TYPES[file.mimetype];
