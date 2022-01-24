@@ -5,7 +5,6 @@ import Signup from '../views/Signup.vue'
 import Posts from '../views/Posts.vue'
 import NewPost from '../views/NewPost.vue'
 import Post from '../views/Post.vue'
-import Test from '../views/Test.vue'
 import Profile from '../views/Profile.vue'
 
 const routes = [
