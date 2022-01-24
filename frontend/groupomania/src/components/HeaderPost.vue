@@ -23,6 +23,9 @@
 export default {
     name: 'HeaderPost',
     methods: {
+        /**
+         * Erase the localStorage, so the item currentUserId doesn't exist anymore
+         */
         wipeLocalStorage() {
             localStorage.clear();
         }

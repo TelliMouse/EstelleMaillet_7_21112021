@@ -27,20 +27,19 @@
         <p id="likeErrorMessage"></p>
         <button v-if="modifyClicked" @click="modifyPost">Publier</button>
         <div class="modify-buttons">
-            <button v-if="displayButtons" @click="modifyButton">Modifier</button>
+            <button v-if="displayButtons && !modifyClicked" @click="modifyButton">Modifier</button>
             <button v-if="displayButtons || displayButtonsAdmin" @click="deletePost">Supprimer</button>
         </div>
-        <router-link :to="{ name: 'Post', query: { id: postId } }" v-if="needLinkToPost">Voir la publication</router-link>
+        <router-link :to="{ name: 'Post', params: { id: postId } }" v-if="needLinkToPost">Voir la publication</router-link>
     </div>
 </template>
 
 <script>
 export default {
-    name: 'Post',
+    name: 'PublishedPost',
     props: {
         postTitle: String,
         postTextPost: Boolean,
-        //userName: String,
         post: String,
         imageUrl: String,
         imageAlt: String,
@@ -51,8 +50,7 @@ export default {
         postModConditions: Boolean,
         postImagePost: Boolean,
         userId: Number, //id of the user who made the post
-        postNeedLinkToPost: Boolean,
-        //loadName: Boolean
+        postNeedLinkToPost: Boolean
     },
     data() {
         return {
@@ -78,6 +76,9 @@ export default {
         }
     },
     methods: {
+        /**
+         * Display the name of the user who made the post
+         */
         getUserName(userId) {
             fetch(`http://localhost:3000/api/users/${userId}`, {
                 credentials: 'include'
@@ -92,51 +93,53 @@ export default {
             .catch(err => {
                 console.log('Error getUserName', err);
                 alert('Une erreur s\'est produite');
-                });
+            });
         },
+        /**
+         * Verify if the user has already liked or disliked the post
+         */
         hasTheUserAlreadyLiked() {
-            console.log('hastheuser begin');
+            //First we find the post in the database
             const currentUserId = localStorage.getItem('currentUserId');
-
             fetch(`http://localhost:3000/api/posts/${this.postId}`, {
                 credentials: 'include'
             })
             .then(res => res.json())
             .then(result => {
-                console.log('hastheuser then');
                 const likeList = result[0].usersLike;
                 const dislikeList = result[0].usersDislike;
+                //Assign true to liked when the user has liked the post
                 if(likeList != []) {
                     for(let userId of likeList) {
                         if(currentUserId == userId) {
-                            console.log('hastheuser liked');
                             this.likesChecked = true;
                             return this.liked = true;
                         }
                     }
                 }
-
+                //Assign true to disliked when the user has disliked the post
                 if(dislikeList != []) {
                     for(let userId of dislikeList) {
                         if(currentUserId == userId) {
-                            console.log('hastheuser disliked');
                             this.likesChecked = true;
                             return this.disliked = true;
                         }
                     }
                 }
-
-                console.log('hastheuser false');
+                //Return false when the user hasn't liked or disliked the post 
                 this.likesChecked = true;
                 return this.liked = false;
-            
             })
             .catch(error => {
                 console.log('Error hasTheUserAlredyLiked', error);
                 alert('Une erreur s\'est produite');
             })
         },
+        /**
+         * Modify the info of the post in the database when the like button is clicked
+         */
         likeClicked() {
+            //When the user hasn't already liked or disliked the post, we record their like in the database
             if(!this.liked && !this.disliked) {
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
@@ -156,6 +159,7 @@ export default {
                         const messagePlace = document.getElementById('likeErrorMessage');
                         messagePlace.innerText = 'Vous ne pouvez pas liker cette publication.';
                     } else {
+                        //We modify the number of likes displayed 
                         this.shownLikeNumber++;
                         this.liked = true;
                         this.hasTheUser = 'liked';
@@ -167,6 +171,7 @@ export default {
                     console.log('Error likeClicked', err);
                     alert('Une erreur s\'est produite');
                 });
+            //When the user has already liked the post, we modify the database to delete their like
             } else if(this.liked && !this.disliked) {
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
@@ -186,6 +191,7 @@ export default {
                         const messagePlace = document.getElementById('likeErrorMessage');
                         messagePlace.innerText = 'Vous ne pouvez pas déliker cette publication.';
                     } else {
+                        //We modify the number of liked displayed
                         this.shownLikeNumber--;
                         this.liked = false;
                         this.hasTheUser = false;
@@ -202,7 +208,11 @@ export default {
                 messagePlace.innerText = 'Vous ne pouvez pas liker cette publication.';
             }
         },
+        /**
+         * Modify the info of the post in the database when the dislike button is clicked
+         */
         dislikeClicked() {
+            //When the user hasn't already liked or disliked the post, we record their dislike in the database
             if(!this.liked && !this.disliked) {
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
@@ -222,6 +232,7 @@ export default {
                         const messagePlace = document.getElementById('likeErrorMessage');
                         messagePlace.innerText = 'Vous ne pouvez pas disliker cette publication.';
                     } else {
+                        //We modify the number of dislikes displayed
                         this.shownDislikeNumber++;
                         this.disliked = true;
                         this.hasTheUser = 'disliked';
@@ -233,6 +244,7 @@ export default {
                     console.log('Error dislikeClicked', err);
                     alert('Une erreur s\'est produite');
                 });
+            //When the user has already disliked the post, we modify the database to delete their dislike
             } else if(this.disliked && !this.liked) {
                 fetch(`http://localhost:3000/api/posts/${this.postId}/like`, {
                     method: 'POST',
@@ -252,6 +264,7 @@ export default {
                         const messagePlace = document.getElementById('likeErrorMessage');
                         messagePlace.innerText = 'Vous ne pouvez pas dédisliker cette publication.';
                     } else {
+                        //We modify the number of dislikes displayed
                         this.shownDislikeNumber--;
                         this.disliked = false;
                         this.hasTheUser = false;
@@ -268,73 +281,99 @@ export default {
                 messagePlace.innerText = 'Vous ne pouvez pas disliker cette publication.';
             }
         },
+        /**
+         * Assign true to modifyClicked when the modify button is clicked
+         */
         modifyButton() {
             this.modifyClicked = true;
         },
+        /**
+         * Assign the input's files to files, so it can return a truthy value, or null
+         */
         addFile() {
             const input = document.getElementById('changeImagePost');
             this.files = input.files
         },
+        /**
+         * Modify the post in the database
+         */
         modifyPost() {
-            const modifiedPost = {
-                title: this.postTitle,
-                user_id: this.userId,
-                text: this.modelPost,
-                imageAlt: this.imageAlt
-            };
-            if(this.files) {
-                const input = document.getElementById('changeImagePost');
-                const data = new FormData();
-                data.append('image', input.files[0]);
-                data.append('json', JSON.stringify(modifiedPost));
-                fetch(`http://localhost:3000/api/posts/${this.postId}`, {
-                    method: 'PUT',
-                    credentials: 'include',
-                    headers: {
-                    "Accept": "application/json",
-                    },
-                    body: data
-                })
-                .then(res => res.json())
-                .then(result => {
-                    if(!result || result.error) {
-                        alert('Une erreur s\'est produite');
+            if(this.modelTitle) {
+                if(this.modelPost || this.files) {
+                    if(this.files && !this.modelImageAlt) {
+                        alert('Veuillez décrire votre image avant de modifier votre publication');
                     } else {
-                        alert('La publication a bien été modifiée!')
-                        this.$emit('post-modified');
-                        this.modifyClicked = false;
+                        const modifiedPost = {
+                            title: this.modelTitle,
+                            user_id: this.userId,
+                            text: this.modelPost,
+                            imageAlt: this.modelImageAlt
+                        };
+                        //We need to treat request differently wether it has an image attached or not.
+                        //We use FormData to attach the file to the request
+                        if(this.files) {
+                            const input = document.getElementById('changeImagePost');
+                            const data = new FormData();
+                            data.append('image', input.files[0]);
+                            data.append('json', JSON.stringify(modifiedPost));
+                            fetch(`http://localhost:3000/api/posts/${this.postId}`, {
+                                method: 'PUT',
+                                credentials: 'include',
+                                headers: {
+                                "Accept": "application/json",
+                                },
+                                body: data
+                            })
+                            .then(res => res.json())
+                            .then(result => {
+                                if(!result || result.error) {
+                                    alert('Une erreur s\'est produite');
+                                } else {
+                                    alert('La publication a bien été modifiée!')
+                                    this.$emit('post-modified');
+                                    this.modifyClicked = false;
+                                }
+                            })
+                            .catch(err => {
+                                console.log('Error modifyPost', err);
+                                alert('Une erreur s\'est produite');
+                            })
+                        } else {
+                            fetch(`http://localhost:3000/api/posts/${this.postId}`, {
+                                method: 'PUT',
+                                credentials: 'include',
+                                headers: {
+                                "Accept": "application/json", 
+                                "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(modifiedPost)
+                            })
+                            .then(res => res.json())
+                            .then(result => {
+                                if(!result || result.error) {
+                                    alert('Une erreur s\'est produite');
+                                } else {
+                                    alert('La publication a bien été modifiée!')
+                                    this.$emit('post-modified');
+                                    this.modifyClicked = false;
+                                }
+                            })
+                            .catch(err => {
+                                console.log('Error modifyPost', err);
+                                alert('Une erreur s\'est produite');
+                            })
+                        }
                     }
-                })
-                .catch(err => {
-                    console.log('Error modifyPost', err);
-                    alert('Une erreur s\'est produite');
-                })
+                } else {
+                    alert('Veuillez remplir tous les champs de saisie avant de modifier votre publication');
+                }
             } else {
-                fetch(`http://localhost:3000/api/posts/${this.postId}`, {
-                    method: 'PUT',
-                    credentials: 'include',
-                    headers: {
-                    "Accept": "application/json", 
-                    "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(modifiedPost)
-                })
-                .then(res => res.json())
-                .then(result => {
-                    if(!result || result.error) {
-                        alert('Une erreur s\'est produite');
-                    } else {
-                        alert('La publication a bien été modifiée!')
-                        this.$emit('post-modified');
-                        this.modifyClicked = false;
-                    }
-                })
-                .catch(err => {
-                    console.log('Error modifyPost', err);
-                    alert('Une erreur s\'est produite');
-                })
-            }
+                alert('Veuillez remplir tous les champs de saisie avant de modifier votre publication');
+            } 
         },
+        /**
+         * Delete the post from the database, and redirects to the main page
+         */
         deletePost() {
             fetch(`http://localhost:3000/api/posts/${this.postId}`, {
                 method: 'DELETE',
@@ -346,7 +385,7 @@ export default {
                         alert('Une erreur s\'est produite');
                     } else {
                         alert('La publication a bien été supprimée!')
-                        this.$router.push('posts');
+                        this.$router.push({ name: 'Posts', params: { page: 1 } });
                     }
                 })
             .catch(err => {
@@ -354,6 +393,9 @@ export default {
                 alert('Une erreur s\'est produite');
             });
         },
+        /**
+         * Verify if the current user viewing the post is the creator of the post, therefore if they can modify or delete the post
+         */
         modConditions() {
             const currentUserId = JSON.parse(localStorage.getItem('currentUserId'));
             if(currentUserId == this.userId && this.postModConditions) {
@@ -362,6 +404,9 @@ export default {
                 return this.displayButtons = false;
             }
         },
+        /**
+         * Verify if the current user viewing the post is an admin and therefore can delete the post
+         */
         modConditionsAndAdmin() {
             const currentUserId = JSON.parse(localStorage.getItem('currentUserId'));
             fetch(`http://localhost:3000/api/users/${currentUserId}`, {
@@ -389,13 +434,16 @@ div.published-post {
     display: flex;
     flex-direction: column;
     background-color: #D3F6DB;
+    width: 85%;
+    margin-top: 2em;
     border-radius: 15px/15px;
-    margin-bottom: 2em;
-    padding: 1em 0.75em 1.5em 0.75em;
-    width: 70%;
+    padding-top: 0.75em;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-bottom: 1.25em;
     &>h1 {
         margin-top: 0;
-        size: 2em;
+        font-size: 2em;
     }
     &>p.post-text {
         background-color: white;
@@ -407,6 +455,7 @@ div.published-post {
     }
     &>h2 {
         color: #4C061D;
+        font-size: 1.3em;
     }
     &>img {
         width: 95%;

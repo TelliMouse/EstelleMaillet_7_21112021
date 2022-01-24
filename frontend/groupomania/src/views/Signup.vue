@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="signup">
         <HeaderLogin />
         <FormSignup/>
     </div>
@@ -18,8 +18,10 @@ export default {
 }
 </script>
 
-<style>
-FormSpace {
-    width: 75%;
+<style lang="scss">
+div.signup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 </style>

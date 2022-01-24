@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div class="posts">
         <HeaderPost />
         <div v-if="loadList">
-            <Post 
+            <PublishedPost 
                 v-for="post in postList"
                 :key="post.id"
                 :postTitle="post.title"
@@ -25,26 +25,29 @@
 
 <script>
 import HeaderPost from '../components/HeaderPost.vue'
-import Post from '../components/Post.vue'
+import PublishedPost from '../components/PublishedPost.vue'
 import Pages from '../components/Pages.vue'
 
 export default {
     name: 'Posts',
     components: {
         HeaderPost,
-        Post,
+        PublishedPost,
         Pages
     },
     data() {
         return {
             postList : this.getPostList(),
-            //users: this.getUsers(),
             loadList: false,
             nameLoaded: false,
-            //loaded: this.loadList && this.loadName
+            currentPage: this.getCurrentPage()
         }
     },
     methods: {
+        /**
+         * Returns a boolean answer to the question is there text in the post
+         * @returns {Boolean}
+         */
         isThereText(text) {
             if(text) {
                 return true;
@@ -52,6 +55,9 @@ export default {
                 return false;
             }
         },
+        /**
+         * Display the name of the user from its id
+         */
         getUserName(userId) {
             fetch(`http://localhost:3000/api/users/${userId}`, {
                 credentials: 'include'
@@ -66,10 +72,13 @@ export default {
             .catch(err => {
                 console.log('Error getUserName', err);
                 alert('Une erreur s\'est produite');
-                });
+            });
         },
+        /**
+         * Change the format of the date from the database format to a "day month year, hourHminutesMsecondsS" format
+         */
         getDate(date) {
-            //"yyyy-mm-ddThh:mm:ss.000Z"
+            //Database format: "yyyy-mm-ddThh:mm:ss.000Z"
             const firstSplit = date.split('-'); //['yyyy', 'mm', 'ddThh:mm:ss.000Z']
             const year = firstSplit[0]; // 'yyyy'
             const monthNum = firstSplit[1]; //'mm'
@@ -100,24 +109,30 @@ export default {
 
             return day + ' ' + month + ' ' + year + ', ' + hour + 'h' + minutes + 'm' + seconds + 's';
         },
+        /**
+         * Find the number of the page that is displayed
+         */
         getCurrentPage() {
-            const page = this.$route.query.page;
-
+            const page = this.$route.params.page;
             if(!page) {
-                return 1;
+                return this.currentPage = 1;
             } else {
-                return parseInt(page, 10);
+                return this.currentPage = parseInt(page, 10);
             }
         },
+        /**
+         * Retrieve all posts, and find which to display according to the page number
+         */
         getPostList() {
+            //We retieve all posts, ordered by date in a descending order
             fetch('http://localhost:3000/api/posts', {
                 credentials: 'include'
             })
             .then(res => res.json())
             .then(result => {
                 let postList = [];
-                const currentPage = this.getCurrentPage();
-                const majPostIndex = currentPage*10;
+                //There are 10 posts per page, so the indexes of the posts to be displayed are between majPostIndex et minPostIndex
+                const majPostIndex = this.currentPage*10;
                 const minPostIndex = majPostIndex - 10;
                 
                 for(let i = minPostIndex; i < majPostIndex; i++) {
@@ -127,17 +142,34 @@ export default {
                 }
 
                 this.loadList = true;
-                return this.postList = result;
+                return this.postList = postList;
             })
             .catch(err => {
                 console.log('Error getPostList', err);
                 alert('Une erreur s\'est produite');
-                });
+            });
+        }
+    },
+    watch: {
+        //When the page number change, we fetch again the posts to be displayed
+        $route() {
+            this.currentPage = this.getCurrentPage();
+            this.loadList = false;
+            this.postList = this.getPostList();   
         }
     }
 }
 </script>
 
-<style>
-
+<style lang="scss">
+div.posts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    &>div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
 </style>

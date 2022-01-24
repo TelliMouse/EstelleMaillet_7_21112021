@@ -1,21 +1,21 @@
 <template>
     <div v-if="loadNumPost">
         <div v-if="existingPreviousPage">
-            <router-link to="/posts">
+            <router-link to="/posts/1">
                 <fa icon="fast-backward" alt="Icone double flèche vers la gauche" />
                 <p>Première page</p>
             </router-link>
-            <router-link :to="{ name: 'Posts', query: { page: previousPage } }">
+            <router-link :to="{ name: 'Posts', params: { page: previousPage } }">
                 <fa icon="arrow-circle-left" alt="Icone de flèche vers la gauche"/>
                 <p>Page précèdente</p>
             </router-link>
         </div>
         <div  v-if="existingNextPage">
-            <router-link :to="{ name: 'Posts', query: { page: nextPage } }">
+            <router-link :to="{ name: 'Posts', params: { page: nextPage } }">
                 <fa icon="arrow-circle-right" alt="Icone de flèche vers la droite"/>
                 <p>Page suivante</p>
             </router-link>
-            <router-link :to="{ name: 'Posts', query: { page: lastPage } }">
+            <router-link :to="{ name: 'Posts', params: { page: lastPage } }">
                 <fa icon="fast-forward" alt="Icon double flèche vers la droite" />
                 <p>Dernière page</p>
             </router-link>
@@ -30,90 +30,113 @@ export default {
         return {
             currentPage: this.getCurrentPage(),
             loadNumPost: false,
-            numberOfPosts: this.getNumberOfPosts(),
             numberOfPages: this.getNumberOfPages(),
-            previousPage: this.getPreviousPageLink(),
-            nextPage: this.getNextPageLink(),
-            lastPage: this.getLastPageLink(),
-            existingPreviousPage: this.isThereAPreviousPage(),
-            existingNextPage: this.isThereANextPage()
+            previousPage: '',
+            nextPage: '',
+            lastPage: '',
+            existingPreviousPage: '',
+            existingNextPage: ''
         }
     },
     methods: {
-        getNumberOfPosts() {
-            console.log('getnumpost');
+        /**
+         * Finds the number necessary to display all posts, with a maximum of 10 posts per page
+         */
+        getNumberOfPages() {
+            //First we need to find the total number of posts
             fetch('http://localhost:3000/api/posts', {
                 credentials: 'include'
             })
             .then(res => res.json())
             .then(result => {
-                console.log('loadnumpost true');
                 this.loadNumPost = true;
-                return this.numberOfPosts = result.length;
+                const numberOfPosts = result.length;
+                const modulo = numberOfPosts%10;
+                //If the number of posts is a multiple of 10, the number of pages necessary is the number of posts divided by ten
+                if(modulo === 0) {
+                    this.numberOfPages = numberOfPosts/10;
+                    //We then call all other functions that rely on the numberOfPages to work
+                    this.getPreviousPageLink();
+                    this.getNextPageLink();
+                    this.getLastPageLink();
+                    this.isThereAPreviousPage();
+                    this.isThereANextPage();
+                    return this.loadNumPost = true;
+                //If the number of posts isn't a multiple of 10, we need to calculate the number of pages needed with the modulo of the number of posts
+                } else {
+                    const majPost = numberOfPosts + 10 - modulo;
+                    this.numberOfPages = majPost/10;
+                    //We then call all other functions that rely on the numberOfPages to work
+                    this.getPreviousPageLink();
+                    this.getNextPageLink();
+                    this.getLastPageLink();
+                    this.isThereAPreviousPage();
+                    this.isThereANextPage();
+                    return this.loadNumPost = true;
+                }
             })
             .catch(err => {
                 console.log('Error getNumberOfPosts', err);
                 alert('Une erreur s\'est produite');
             });
         },
-        getNumberOfPages() {
-            console.log('getnumpages');
-            const post = this.numberOfPosts;
-            console.log('post getnumpages: ', post);
-            const modulo = post%10;
-            console.log('modulo getnumpage: ', post%10);
-            if(modulo === 0) {
-                console.log('modulo 0, numpage: ', post/10);
-                return this.numberOfPages = post/10;
-            } else {
-                const majPost = post + 10 - modulo
-                console.log('modulo no0, numpage: ', majPost/10);
-                return this.numberOfPages = majPost/10;
-            }
-        },
+        /**
+         * We find what page is on display
+         */
         getCurrentPage() {
-            console.log('getcurrentpage');
-            const page = this.$route.query.page;
+            const page = this.$route.params.page;
 
             if(!page) {
-                console.log('no query page');
                 return this.currentPage = 1;
             } else {
-                console.log('query page: ', parseInt(page, 10));
                 return this.currentPage = parseInt(page, 10);
             }
         },
+        /**
+         * We find if there is a previous page to display
+         */
         isThereAPreviousPage() {
-            console.log('isprevpage');
             if(this.currentPage > 1) {
-                console.log('prevpage true');
                 return this.existingPreviousPage = true;
             } else {
-                console.log('prevpage false');
                 return this.existingPreviousPage = false;
             }
         },
+        /**
+         * We find if there is a next page to display
+         */
         isThereANextPage() {
-            console.log('isnextpage');
             if(this.currentPage < this.numberOfPages) {
-                console.log('nextpage true');
                 return this.existingNextPage = true;
             } else {
-                console.log('nextpage false');
                 return this.existingNextPage = false;
             }
         },
+        /**
+         * We calculate the number of the previous page
+         */
         getPreviousPageLink() {
-            console.log('prevpagelink: ', this.currentPage - 1);
             return this.previousPage = this.currentPage - 1;
         },
+        /**
+         * We calculate the number of the next page
+         */
         getNextPageLink() {
-            console.log('nextpagelink: ', this.currentPage + 1);
             return this.nextPage = this.currentPage + 1;
-        }   ,
+        },
+        /**
+         * We find the number of the last page
+         */
         getLastPageLink() {
-            console.log('lastpagelink: ', this.numberOfPages);
             return this.lastPage = this.numberOfPages;
+        }
+    },
+    watch: {
+        //When the page number change, we find again if there are previous and next pages
+        $route() {
+            this.currentPage = this.getCurrentPage();
+            this.loadNumPost = false;
+            this.numberOfPages = this.getNumberOfPages();
         }
     }
 }

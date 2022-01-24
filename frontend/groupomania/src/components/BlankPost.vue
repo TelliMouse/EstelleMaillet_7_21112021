@@ -30,10 +30,10 @@ export default {
         return {
             textIsChecked: true,
             imageIsChecked: false,
-            modelTextPost: '',
-            files: '',
-            imageUrl: '',
-            imageAlt: '',
+            modelTextPost: null,
+            files: null,
+            imageUrl: null,
+            imageAlt: null,
             modelTitle: ''
         }
     },
@@ -64,70 +64,83 @@ export default {
             this.files = input.files;
         },
         /**
-         * Rewrite the current date to match the format 'YYYY-MM-DD HH:MM:SS' of MySQL
+         * Rewrite the current date to match the format 'yyyy-mm-ddThh:mm:ss' of MySQL
          */
         getCurrentDate() {
             const date = new Date(Date.now());
-            return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
+            return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + 'T' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
         },
         /**
          * Retrieve post's values to create a post through the API, then, if successfull, redirects to the main page
          */
         publishPost() {
-            const newPost = {
-                title: this.modelTitle,
-                user_id: parseInt(localStorage.getItem('currentUserId'), 10),
-                text: this.modelTextPost,
-                imageUrl: this.imageUrl,
-                imageAlt: this.imageAlt,
-                date: this.getCurrentDate()
-            };
-            if(this.files) {
-                const input = document.getElementById('imagePost');
-                const data = new FormData();
-                data.append('image', input.files[0]);
-                data.append('json', JSON.stringify(newPost));
-                fetch('http://localhost:3000/api/posts', {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        "Accept": "application/json"
-                    },
-                    body: data
-                })
-                .then(res => {
-                    const result = res.json();
-                    if(!result) {
-                        alert('Une erreur s\'est produite');
+            if(this.modelTitle) {
+                if(this.modelTextPost || this.files) {
+                    if(this.files && !this.imageAlt) {
+                        alert('Veuillez ajouter une description à votre image')
                     } else {
-                        alert('La publication a bien été enregistrée');
-                        this.$router.push('posts');
+                        const newPost = {
+                            title: this.modelTitle,
+                            user_id: parseInt(localStorage.getItem('currentUserId'), 10),
+                            text: this.modelTextPost,
+                            imageUrl: this.imageUrl,
+                            imageAlt: this.imageAlt,
+                            date: this.getCurrentDate()
+                        };
+                        if(this.files) {
+                            const input = document.getElementById('imagePost');
+                            const data = new FormData();
+                            data.append('image', input.files[0]);
+                            data.append('json', JSON.stringify(newPost));
+                            fetch('http://localhost:3000/api/posts', {
+                                method: 'POST',
+                                credentials: 'include',
+                                headers: {
+                                    "Accept": "application/json"
+                                },
+                                body: data
+                            })
+                            .then(res => {
+                                const result = res.json();
+                                if(!result) {
+                                    alert('Une erreur s\'est produite');
+                                } else {
+                                    alert('La publication a bien été enregistrée');
+                                    this.$router.push({ name: 'Posts', params: { page: 1 } });
+                                }
+                            })
+                        } else {
+                            fetch('http://localhost:3000/api/posts', {
+                                method: 'POST',
+                                credentials: 'include', 
+                                headers: {
+                                    "Accept": "application/json", 
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(newPost)
+                            })
+                            .then(res => res.json())
+                            .then(result => {
+                                if(!result) {
+                                    alert('Une erreur s\'est produite');
+                                } else {
+                                    alert('La publication a bien été enregistrée');
+                                    this.$router.push({ name: 'Posts', params: { page: 1 } });
+                                }
+                            })
+                            .catch(err => {
+                                console.log('Error publishPost', err);
+                                alert('Une erreur s\'est produite');
+                            });
+                        }
                     }
-                })
+                } else {
+                    alert('Veuillez remplir tous les champs de saisies');
+                }
             } else {
-                fetch('http://localhost:3000/api/posts', {
-                    method: 'POST',
-                    credentials: 'include', 
-                    headers: {
-                        "Accept": "application/json", 
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(newPost)
-                })
-                .then(res => res.json())
-                .then(result => {
-                    if(!result) {
-                        alert('Une erreur s\'est produite');
-                    } else {
-                        alert('La publication a bien été enregistrée');
-                        this.$router.push('posts');
-                    }
-                })
-                .catch(err => {
-                    console.log('Error publishPost', err);
-                    alert('Une erreur s\'est produite');
-                });
+                alert('Veuillez remplir tous les champs de saisies');
             }
+            
         }
     }
 }

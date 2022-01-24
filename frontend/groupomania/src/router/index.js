@@ -40,11 +40,6 @@ const routes = [
     component: Post
   },
   {
-    path: '/test',
-    name: 'Test',
-    component: Test
-  },
-  {
     path: '/profile',
     name: 'Profile',
     component: Profile

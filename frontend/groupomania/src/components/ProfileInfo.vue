@@ -38,9 +38,11 @@ export default {
         }
     },
     methods: {
+        /**
+         * We find the user in the database and display their infos
+         */
         getUser() {
             const userId = parseInt(localStorage.getItem('currentUserId'), 10);
-            console.log('userId:', userId);
             fetch(`http://localhost:3000/api/users/${userId}`, {
                 credentials: 'include'
             })
@@ -57,11 +59,18 @@ export default {
                 alert('Une erreur s\'est produite');
             })
         },
+        /**
+         * Assign true to deleteClicked when the button is clicked
+         */
         clickDelete() {
             this.deleteClicked = true
         },
+        /**
+         * Delete the user from the database, after having verified the validity of the password given
+         */
         deleteProfile() {
             if(this.password) {
+                //First we verify if the password given is correct
                 fetch('http://localhost:3000/api/users/password', {
                     method: 'POST',
                     credentials: 'include',
@@ -81,12 +90,14 @@ export default {
                     } else if (!result.valid) {
                         alert('Le mot-de-passe entré n\'est pas le bon')
                     } else {
+                        //Then, we delete the user from the database
                         const userId = parseInt(localStorage.getItem('currentUserId'), 10);
                         fetch(`http://localhost:3000/api/users/${userId}`, {
                             method: 'DELETE',
                             credentials: 'include'
                         })
                         .then(() => {
+                            //Then we redirects to the login page, and clear the localStorage to delete the item currentUserId
                             alert('Votre compte a bien été supprimé');
                             localStorage.clear();
                             this.$router.push('/login');

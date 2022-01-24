@@ -2,7 +2,7 @@
     <div class="view-Post">
         <HeaderNewPost />
         <div v-if="loaded">
-            <Post 
+            <PublishedPost 
                 :postTitle="post.title" 
                 :post="post.text"
                 :imageUrl="post.imageUrl" 
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import Post from '../components/Post.vue'
+import PublishedPost from '../components/PublishedPost.vue'
 import HeaderNewPost from '../components/HeaderNewPost.vue'
 import BlankComment from '../components/BlankComment.vue'
 import PublishedComment from '../components/PublishedComment.vue'
@@ -46,7 +46,7 @@ import PublishedComment from '../components/PublishedComment.vue'
 export default {
     name: 'Post',
     components: {
-        Post,
+        PublishedPost,
         HeaderNewPost,
         BlankComment,
         PublishedComment
@@ -60,6 +60,10 @@ export default {
         }
     },
     methods: {
+        /**
+         * Returns a boolean answer to the question is there text in the post
+         * @returns {Boolean}
+         */
         isThereText(text) {
             if(text) {
                 return true;
@@ -67,8 +71,11 @@ export default {
                 return false;
             }
         },
+        /**
+         * Change the format of the date from the database format to a "day month year, hourHminutesMsecondsS" format
+         */
         getDate(date) {
-            //"yyyy-mm-ddThh:mm:ss.000Z"
+            //Databas format: "yyyy-mm-ddThh:mm:ss.000Z"
             const firstSplit = date.split('-'); //['yyyy', 'mm', 'ddThh:mm:ss.000Z']
             const year = firstSplit[0]; // 'yyyy'
             const monthNum = firstSplit[1]; //'mm'
@@ -108,28 +115,29 @@ export default {
 
             return day + ' ' + month + ' ' + year + ', ' + hour + 'h' + minutes + 'm' + seconds + 's';
         },
+        /**
+         * Retrieve the post to be displayed
+         */
         getPost() {
-            console.log('query: ', this.$route.query.id);
-            const postId = this.$route.query.id;
-            console.log('postid: ', postId);
-
+            const postId = this.$route.params.id;
             fetch(`http://localhost:3000/api/posts/${postId}`, {
                 credentials: 'include'
             })
             .then(res => res.json())
             .then(result => {
-                console.log('fetch');
                 this.loaded = true;
                 return this.post = result[0];
             })
             .catch(err => {
                 console.log('Error getPost', err);
                 alert('Un erreur s\'est produite');
-                });
+            });
         },
+        /**
+         * Retrieve all comments related to the post, sorted by date in an ascending order
+         */
         getComments() {
-            const postId = this.$route.query.id;
-
+            const postId = this.$route.params.id;
             fetch(`http://localhost:3000/api/posts/${postId}/comments`, {
                 credentials: 'include'
             })
@@ -141,8 +149,11 @@ export default {
             .catch(err => {
                 console.log('Error getComments', err);
                 alert('Une erreur s\'est produite');
-                });
+            });
         },
+        /**
+         * Retrieve the data of the comment which just got published, and add it to the comment list
+         */
         addNewComment(payload) {
             this.commentList.push({
                 ...payload,
@@ -152,8 +163,10 @@ export default {
                 usersDislike: []
             });
         },
+        /**
+         * Retrieve the data of the modified comment, find its index in the commentList, and modify it in the commentlist
+         */
         modifyComment(payload) {
-            //trouver l'index du comment à changer dans commentList
             const findIndexOfComment = () => {
                 for(let i = 0; i < this.commentList.length; i++) {
                     if(this.commentList[i].id == payload.id)  {
@@ -165,6 +178,9 @@ export default {
             const index = findIndexOfComment();
             this.commentList[index].text = payload.text;
         },
+        /**
+         * Delete comment from the comment list, by finding its index in the list from its id
+         */
         deleteComment(payload) {
             const findIndexOfComment = () => {
                 for(let i = 0; i < this.commentList.length; i++) {
@@ -177,6 +193,9 @@ export default {
             const index = findIndexOfComment();
             this.commentList.splice(index, 1);
         },
+        /**
+         * Fetch again the post once it has been modified
+         */
         modifyPost() {
             this.loaded = false;
             return this.post = this.getPost();

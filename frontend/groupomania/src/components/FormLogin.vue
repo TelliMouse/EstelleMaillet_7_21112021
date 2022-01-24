@@ -56,15 +56,14 @@ export default {
                     const userId = result.id;
                     if(userId) {
                         localStorage.setItem('currentUserId', userId);
-
-                        this.$router.push({ name: 'Posts'});
+                        this.$router.push({ name: 'Posts', params: { page: 1 } });
                     } else {
                         alert('Une erreur s\'est produite');
                     }
                 })
                 .catch(err => {
                     console.log('Error loginUser', err);
-                    alert('Une erreur s\'est produite');
+                    alert('Une erreur s\'est produite. Veuillez vérifier que vos mot-de-passe et email sont correctes.');
                 });
             } else {
                 alert('Veuillez remplir tous les champs de saisie!');
@@ -100,6 +99,7 @@ div.form-login {
     &>button {
         margin-top: 1em;
         width: 20%;
+        min-width: fit-content;
         align-self: center;
         color: white;
         background-color: #4C061D;
