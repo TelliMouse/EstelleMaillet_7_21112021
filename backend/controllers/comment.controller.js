@@ -162,3 +162,10 @@ exports.likeComment = (req, res, next) => {
         }
     })
 };
+
+exports.getOneComment = (req, res, next) => {
+    sql.query(`SELECT * FROM comment WHERE id = ${req.params.id}`, (error, result) => {
+        if(error) return res.status(400).json({ error });
+        return res.status(200).json(result[0]);
+    })
+}

@@ -78,10 +78,14 @@ exports.getUserById = (req, res, next) => {
     })
 };
 
-//Retrieve the list of all users
-exports.getAllUsers = (req, res, next) => {
-    sql.query('SELECT * FROM user', (error, result) => {
+//Verify if an email is unique
+exports.isTheEmailUnique = (req, res, next) => {
+    sql.query(`SELECT * FROM user WHERE email = "${req.body.email}"`, (error, result) => {
         if(error) res.status(400).json({ error });
-        res.status(200).json(result);
+        if(result[0]) {
+            return res.status(200).json({ unique : false});
+        } else {
+            return res.status(200).json({ unique : true});
+        }
     })
-}
+};
