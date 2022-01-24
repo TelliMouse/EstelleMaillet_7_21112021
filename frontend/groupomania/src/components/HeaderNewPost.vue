@@ -3,7 +3,11 @@
         <img class="desktop" src="../assets/icon-above-font-removebg-preview.png" />
         <img class="phone" src="../assets/icon-removebg-preview.png" />
         <nav>
-            <router-link to="/posts">
+            <router-link to="/profile">
+                <fa icon="user-circle" />
+                <p>Mon Profil</p>
+            </router-link>
+            <router-link :to="{ name: 'Posts', params: { page: 1 } }">
                 <fa icon="home"/>
                 <p>Acceuil</p>
             </router-link>
@@ -27,5 +31,5 @@ export default {
 </script>
 
 <style>
-
+/*Header style defined in component HeaderLogin.vue*/
 </style>

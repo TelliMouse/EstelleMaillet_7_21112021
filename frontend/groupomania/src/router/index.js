@@ -7,6 +7,7 @@ import Posts from '../views/Posts.vue'
 import NewPost from '../views/NewPost.vue'
 import Post from '../views/Post.vue'
 import Test from '../views/Test.vue'
+import Profile from '../views/Profile.vue'
 
 const routes = [
   {
@@ -33,7 +34,7 @@ const routes = [
     component: Signup
   },
   {
-    path: '/posts',
+    path: '/posts/:page',
     name: 'Posts',
     component: Posts
   },
@@ -48,7 +49,7 @@ const routes = [
     component: NewPost
   },
   {
-    path: '/post',
+    path: '/post/:id',
     name: 'Post',
     component: Post
   },
@@ -56,6 +57,11 @@ const routes = [
     path: '/test',
     name: 'Test',
     component: Test
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile
   }
 ]
 
