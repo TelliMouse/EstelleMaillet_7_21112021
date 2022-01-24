@@ -89,3 +89,28 @@ exports.isTheEmailUnique = (req, res, next) => {
         }
     })
 };
+
+//Verify if the password given is valid for the account
+exports.isThePasswordValid = (req, res, next) => {
+    sql.query(`SELECT * FROM user WHERE email = '${req.body.email}'`, (error, result) => {
+        if(error) return res.status(400).json({ error })
+        if(!result[0]) return res.status(200).json({ message: "L'email ne correspond à aucun compte" })
+        bcrypt.compare(req.body.password, result[0].password)
+        .then(valid => {
+            if(valid) {
+                return res.status(200).json({ valid: true })
+            } else {
+                return res.status(200).json({ valid: false })
+            }
+        })
+        .catch(error => res.status(500).json({ error }))
+    })
+};
+
+//Delete the user from the database
+exports.deleteUser = (req, res, next) => {
+    sql.query(`DELETE FROM user WHERE id = ${req.params.id}`, (error, result) => {
+        if(error) return res.status(400).json({ error })
+        return res.status(200).json({ message: "L'utilisateur a bien été supprimé" })
+    })
+}
