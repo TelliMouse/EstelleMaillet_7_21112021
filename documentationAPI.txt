@@ -1,23 +1,27 @@
+Local port: http://localhost:3000
+
+METHOD  ROUTE                   BODY
+
 POST    /api/users/signup       {firstname: String, lastname: String, email; String, password: String}
 POST    /api/users/login        {email: String, password: String}
-        res                     {userId as a String}  
+        res                     {userId: Number}  
 GET     /api/users/:id          {}
         res                     {id: Integer, firstname: String, lastname: String, email; String, password: String}
-GET     /api/users              {}
-        res                     {liste de tous les users}
+POST    /api/users/email        {email: String}
+        res                     {unique: Boolean}
+POST    /api/users/password     {email: String, password: String}
+        res                     {valid: Boolean}
 POST    /api/posts              {title: String, text: String, imageUrl: String, imageAlt: String, user_id: Integer, date: String}
 DELETE  /api/posts/:id          {}
 GET     /api/posts/:id          {}
-        res                     {toutes les charactéristiques du post}
+        res                     {id: Number, title: String, text: String, imageUrl: String, imageAlt: String, user_id: Integer, date: String}
 GET     /api/posts              {}
-        res                     {array de tous les objets Post}
-PUT     /api/posts/:id          {soit comme pour GET avec les champs à modifier, soit image: file et post: JSON}
-POST    /api/posts/:id/like     {user_id: Integer, like: 1, -1 ou 0}
+        res                     { [{...}, {...}...] }
+PUT     /api/posts/:id          {FormData.append('image', files); FormData.append('json', modifiedPost) || modifiedPost: String}
+POST    /api/posts/:id/like     {user_id: Integer, like: 1, -1 or 0}
 GET     /api/posts/:id/comments {}     
-        res                     {array de tous les comments}
-POST    /api/comments           {user_id, post_id, text, date}
-PUT     /api/comments/:id       {les champs à modifier}
+        res                     { [{...}, {...}...] }
+POST    /api/comments           {user_id: Number, post_id: Number, text: String, date: String}
+PUT     /api/comments/:id       {modifiedComment: String}
 DELETE  /api/comments/:id       {}
-GET     /api/comments/:id       {}
-        res                     {infos sur le comment}
-POST    /api/comments/:id/like  {user_id, like}
+POST    /api/comments/:id/like  {user_id: Number, like: 1, -1 or 0}
