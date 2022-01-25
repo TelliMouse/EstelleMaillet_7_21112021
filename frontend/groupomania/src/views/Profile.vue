@@ -7,7 +7,7 @@
 
 <script>
 import ProfileInfo from '../components/ProfileInfo.vue'
-import HeaderProfile from '../components/HeaderPost.vue'
+import HeaderProfile from '../components/HeaderProfile.vue'
 
 export default {
     name: 'Profile',
