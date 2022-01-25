@@ -301,8 +301,8 @@ export default {
          */
         modifyPost() {
             if(this.modelTitle) {
-                if(this.modelPost || this.files) {
-                    if(this.files && !this.modelImageAlt) {
+                if(this.modelPost || this.imagePost) {
+                    if(this.imagePost && !this.modelImageAlt) {
                         alert('Veuillez décrire votre image avant de modifier votre publication');
                     } else {
                         const modifiedPost = {
