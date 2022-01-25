@@ -171,6 +171,7 @@ div.form-signup {
     padding-left: 0.75em;
     padding-right: 0.75em;
     padding-bottom: 1em;
+    min-width: fit-content;
     &>h1 {
         align-self: center;
     }

@@ -148,6 +148,7 @@ div.pages {
     flex-direction: row;
     justify-content: space-between;
     margin-top: 1.5em;
+    min-width: fit-content;
     &>div.direction {
         display: flex;
         flex-direction: row;

@@ -56,6 +56,7 @@ export default {
 <style lang="scss">
 header {
     width: 100%;
+    min-width: fit-content;
     &>div.main-header {
         background-color: #4C061D;
         display: flex;

@@ -443,6 +443,7 @@ div.published-post {
     padding-left: 1em;
     padding-right: 1em;
     padding-bottom: 1.25em;
+    min-width: fit-content;
     &>h1 {
         margin-top: 0;
         font-size: 2em;

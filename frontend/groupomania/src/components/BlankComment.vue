@@ -105,6 +105,7 @@ div.blank-comment {
     padding-left: 0.75em;
     padding-right: 0.75em;
     padding-bottom: 1em;
+    min-width: fit-content;
     &>h3 {
         font-size: 1.1em;
         color: #4C061D;

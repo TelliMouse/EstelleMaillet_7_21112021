@@ -359,6 +359,7 @@ div.published-comment {
     padding-left: 0.75em;
     padding-right: 00.75em;
     padding-bottom: 1em;
+    min-width: fit-content;
     &>h3 {
         font-size: 1.1em;
         color: #4C061D;
