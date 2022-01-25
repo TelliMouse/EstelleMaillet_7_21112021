@@ -68,7 +68,6 @@ export default {
             } else {
                 alert('Veuillez remplir tous les champs de saisie!');
             }
-            
         }
     }
 }
