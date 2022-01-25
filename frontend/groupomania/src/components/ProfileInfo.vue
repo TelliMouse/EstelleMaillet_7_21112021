@@ -1,20 +1,20 @@
 <template>
-    <div>
+    <div class="profile-info">
         <h1>Mon Profil</h1>
         <div v-if="userLoaded">
             <p>Prénom:</p>
-            <p>{{ firstname }}</p>
+            <p class="data">{{ firstname }}</p>
         </div>
         <div v-if="userLoaded">
             <p>Nom:</p>
-            <p>{{ lastname }}</p>
+            <p class="data">{{ lastname }}</p>
         </div>
         <div v-if="userLoaded">
             <p>Email:</p>
-            <p>{{ email }}</p>
+            <p class="data">{{ email }}</p>
         </div>
         <button @click="clickDelete">Supprimer mon profil</button>
-        <div v-if="deleteClicked">
+        <div class="delete" v-if="deleteClicked">
             <p>Pour valider la suppression de votre profil, veuillez rentrer votre mot-de-passe:</p>
             <label for="password">Mot-de-passe:</label>
             <input name="password" type="password" v-model="password"/>
@@ -121,5 +121,68 @@ export default {
 </script>
 
 <style lang="scss">
-
+div.profile-info {
+    display: flex;
+    flex-direction: column;
+    background-color: #D3F6DB;
+    width: 85%;
+    margin-top: 2em;
+    border-radius: 15px/15px;
+    padding-left: 0.75em;
+    padding-right: 00.75em;
+    padding-bottom: 1em;
+    &>h1 {
+        align-self: center;
+    }
+    &>div {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        font-size: 1.2em;
+        &>p.data {
+            color: #4C061D;
+        }
+    }
+    &>button {
+        margin-top: 1em;
+        width: 20%;
+        min-width: fit-content;
+        align-self: center;
+        color: white;
+        background-color: #4C061D;
+        border-radius: 15px/15px;
+        border: none;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+        box-shadow: 2px 2px 3px #11020F;
+        cursor: pointer;
+    }
+    &>div.delete {
+        display: flex;
+        flex-direction: column;
+        font-size: 1.1em;
+        margin-top: 1em;
+        &>p {
+            align-self: center;
+        }
+        &>input {
+            border: 2px solid #92D5E6;
+            border-radius: 15px/15px;
+        }
+        &>button {
+            margin-top: 1em;
+            width: 20%;
+            min-width: fit-content;
+            align-self: center;
+            color: white;
+            background-color: #4C061D;
+            border-radius: 15px/15px;
+            border: none;
+            padding-top: 0.5em;
+            padding-bottom: 0.5em;
+            box-shadow: 2px 2px 3px #11020F;
+            cursor: pointer;
+        }
+    }
+}
 </style>

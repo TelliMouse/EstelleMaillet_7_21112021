@@ -1,6 +1,7 @@
 <template>
     <div class="published-post">
         <h1 v-if="!modifyClicked">{{ postTitle }}</h1>
+        <label for="changeTitle" v-if="modifyClicked">Titre:</label>
         <input v-if="modifyClicked" type="text" id="changeTitle" v-model="modelTitle"/>
 
         <h2 v-if="loadName">{{ userName }}</h2>
@@ -9,12 +10,13 @@
         <textarea v-if="textPost && modifyClicked" name="textarea" rows="5" cols="30" v-model="modelPost"></textarea>
 
         <img v-if="imagePost && !modifyClicked" :src="imageUrl" :alt="imageAlt"/>
-
-        <label v-if="imagePost && modifyClicked" for="changeImagePost">Si vous souhaitez changer votre image, choisissez un nouveau fichier:</label>
-        <input v-if="imagePost && modifyClicked" @input="addFile" type="file" name="image" id="changeImagePost" accept="image/jpg, image/jpeg, image/png, image/gif, image/bmp, image/webp, image/svg+xml"/>
-        <label v-if="imagePost && modifyClicked" for="changeImageAlt">Si vous avez changé votre image, veuillez la décrire en quelques mots:</label>
-        <input v-if="imagePost && modifyClicked" type="text" name="image" id="changeImageUrl" placeholder="Exemple: Photographie d'une colline verdoyante devant un ciel bleu sans nuage" v-model="modelImageAlt"/>
-        <p v-if="imagePost && modifyClicked">Avoir des textes alternatifs pour vos images permet d'avoir un contenu plus accessible pour les personnes malvoyantes</p>
+        <div class="image">
+            <label v-if="imagePost && modifyClicked" for="changeImagePost">Si vous souhaitez changer votre image, choisissez un nouveau fichier:</label>
+            <input v-if="imagePost && modifyClicked" @input="addFile" type="file" name="image" id="changeImagePost" accept="image/jpg, image/jpeg, image/png, image/gif, image/bmp, image/webp, image/svg+xml"/>
+            <label v-if="imagePost && modifyClicked" for="changeImageAlt">Si vous avez changé votre image, veuillez la décrire en quelques mots:</label>
+            <input v-if="imagePost && modifyClicked" type="text" name="image" id="changeImageUrl" placeholder="Exemple: Photographie d'une colline verdoyante devant un ciel bleu sans nuage" v-model="modelImageAlt"/>
+            <p v-if="imagePost && modifyClicked"><fa icon="info-circle" class="icon" />Avoir des textes alternatifs pour vos images permet d'avoir un contenu plus accessible pour les personnes malvoyantes</p>
+        </div>
         <div class="like-date">
             <div v-if="likesChecked">
                 <button @click="likeClicked" v-if="liked" class="liked"><fa icon="thumbs-up" alt="Icone de like"/>{{ shownLikeNumber }}</button>
@@ -25,12 +27,12 @@
             <p>{{ date }}</p>
         </div>
         <p id="likeErrorMessage"></p>
-        <button v-if="modifyClicked" @click="modifyPost">Publier</button>
         <div class="modify-buttons">
+            <button v-if="modifyClicked" @click="modifyPost">Publier</button>
             <button v-if="displayButtons && !modifyClicked" @click="modifyButton">Modifier</button>
             <button v-if="displayButtons || displayButtonsAdmin" @click="deletePost">Supprimer</button>
         </div>
-        <router-link :to="{ name: 'Post', params: { id: postId } }" v-if="needLinkToPost">Voir la publication</router-link>
+        <router-link :to="{ name: 'Post', params: { id: postId } }" class="router-link" v-if="needLinkToPost">Voir la publication</router-link>
     </div>
 </template>
 
@@ -445,6 +447,21 @@ div.published-post {
         margin-top: 0;
         font-size: 2em;
     }
+    &>label {
+        font-size: 2em;
+    }
+    &>input {
+        border: solid 2px #92D5E6;
+        border-radius: 15px/15px;
+        height: 2em;
+        margin-bottom: 00.75em;
+        font-size: 1.2em;
+    }
+    &>h2 {
+        color: #4C061D;
+        font-size: 1.3em;
+        margin-top: 0;
+    }
     &>p.post-text {
         background-color: white;
         border: #92D5E6 solid 2px;
@@ -452,40 +469,77 @@ div.published-post {
         white-space: pre-wrap;
         padding: 0.75em 0.5em;
         align-self: center;
+        font-size: 1em;
     }
-    &>h2 {
-        color: #4C061D;
-        font-size: 1.3em;
+    &>textarea {
+        border: solid 2px #92D5E6;
+        border-radius: 15px/15px;
+        font-size: 1em;
+        margin-bottom: 00.5em;
     }
     &>img {
         width: 95%;
         border: #92D5E6 solid 3px;
         align-self: center;
     }
+    &>div.image {
+        display: flex;
+        flex-direction: column;
+        &>label {
+            font-size: 1.1em;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+        }
+        &>input#imageAlt {
+            border: 2px solid #92D5E6;
+            border-radius: 15px/15px;
+        }
+        &>p {
+            font-size: 1em;
+            color: #4C061D;
+            align-self: center;
+            margin-top: 00.25em;
+            padding-left: 0.25em;
+            padding-right: 00.25em;
+            &>.icon {
+                margin-right: 00.5em;
+            }
+        }
+    }
     &>div.like-date {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
+        font-size: 1em;
         &>div {
             display: flex;
             flex-direction: row;
             align-items: center;
             width: 10%;
+            max-width: 6em;
             justify-content: space-between;
             &>button{
                 align-self: center;
                 border-radius: 15px/15px;
-                border: #92D5E6 solid 1px;
                 box-shadow: 2px 2px 3px #0E4749;
                 padding: 0.25em 0.5em;
                 margin-right: 0.25em;
+                min-width: fit-content;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-size: 1em;
+                width: 2.5em;
+                height: 2.5em;
+                cursor: pointer;
                 &.liked {
-                    background-color: #A1EF8B;
-                    color: black;
+                    background-color: #4C061D;
+                    color: white;
                 }
                 &.not-liked {
                     background-color: white;
                     color: black;
+                    border: #92D5E6 solid 1px;
                 }
                 
             }
@@ -496,14 +550,26 @@ div.published-post {
         flex-direction: row;
         justify-content: space-between;
         &>button {
-            color: #002626;
+            margin-top: 1em;
+            width: 20%;
+            min-width: fit-content;
+            align-self: center;
+            color: white;
+            background-color: #4C061D;
             border-radius: 15px/15px;
-            border: #002626 solid 1px;
-            box-shadow: solid 2px 2px 3px #0E4749;
-            padding: 0.5em 0.75em;
+            border: none;
+            padding-top: 0.5em;
+            padding-bottom: 0.5em;
+            box-shadow: 2px 2px 3px #11020F;
+            cursor: pointer;
         }
     }
+    &>.router-link {
+        text-decoration: none;
+        font-size: 1em;
+        align-self: center;
+        color: #4C061D;
+        cursor: pointer;
+    }
 }
-
-
 </style>

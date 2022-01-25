@@ -1,6 +1,6 @@
 <template>
-    <div v-if="loadNumPost">
-        <div v-if="existingPreviousPage">
+    <div class="pages" v-if="loadNumPost">
+        <div class="direction" v-if="existingPreviousPage">
             <router-link to="/posts/1">
                 <fa icon="fast-backward" alt="Icone double flèche vers la gauche" />
                 <p>Première page</p>
@@ -10,7 +10,7 @@
                 <p>Page précèdente</p>
             </router-link>
         </div>
-        <div  v-if="existingNextPage">
+        <div class="direction" v-if="existingNextPage">
             <router-link :to="{ name: 'Posts', params: { page: nextPage } }">
                 <fa icon="arrow-circle-right" alt="Icone de flèche vers la droite"/>
                 <p>Page suivante</p>
@@ -142,6 +142,29 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="scss">
+div.pages {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 1.5em;
+    &>div.direction {
+        display: flex;
+        flex-direction: row;
+        width: fit-content;
+        justify-content: space-between;
+        &>a {
+            text-decoration: none;
+            font-size: 1em;
+            color: #4C061D;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-left: 1em;
+            padding-right: 1em;
+            cursor: pointer;
+        }
+    }
+}
 </style>

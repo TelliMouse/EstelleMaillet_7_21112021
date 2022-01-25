@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="view-Profile">
         <HeaderPost />
         <ProfileInfo />
     </div> 
@@ -19,5 +19,9 @@ export default {
 </script>
 
 <style lang="scss">
-
+div.view-Profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 </style>

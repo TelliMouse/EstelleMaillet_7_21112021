@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div class="blank-comment">
         <h3 v-if="loadName">{{ userName }}</h3>
         <label for="comment">Votre commentaire:</label>
-        <textarea name="text" id="comment" cols="30" rows="10" v-model="comment"></textarea>
+        <textarea name="text" id="comment" cols="30" rows="10" v-model="comment" placeholder="Ecrivez votre commentaire ici!"></textarea>
         <button @click="publishComment">Publier</button>
     </div>
 </template>
@@ -94,6 +94,42 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="scss">
+div.blank-comment {
+    display: flex;
+    flex-direction: column;
+    width: 85%;
+    background-color: #A1EF8B;
+    margin-top: 2em;
+    border-radius: 15px/15px;
+    padding-left: 0.75em;
+    padding-right: 0.75em;
+    padding-bottom: 1em;
+    &>h3 {
+        font-size: 1.1em;
+        color: #4C061D;
+    }
+    &>label {
+        font-size: 1em;
+        margin-bottom: 0.5em;
+    }
+    &>textarea {
+        border: solid 2px #92D5E6;
+        border-radius: 15px/15px;
+    }
+    &>button {
+        margin-top: 1em;
+        width: 20%;
+        min-width: fit-content;
+        align-self: center;
+        color: white;
+        background-color: #4C061D;
+        border-radius: 15px/15px;
+        border: none;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+        box-shadow: 2px 2px 3px #11020F;
+        cursor: pointer;
+    }
+}
 </style>

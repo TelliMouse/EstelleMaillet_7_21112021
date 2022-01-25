@@ -204,10 +204,16 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 div.view-Post {
     display: flex;
     flex-direction: column;
     align-items: center;
+    &>div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
 }
 </style>

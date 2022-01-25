@@ -108,12 +108,14 @@ div.form-login {
         padding-top: 0.5em;
         padding-bottom: 0.5em;
         box-shadow: 2px 2px 3px #11020F;
+        cursor: pointer;
     }
     &>a {
         text-decoration: none;
         color: #4C061D;
         align-self: center;
         margin-top: 1em;
+        cursor: pointer;
     }
 }
 </style>

@@ -1,9 +1,9 @@
 <template>
-    <div>
+    <div class="published-comment">
         <h3 v-if="loadName">{{ userName }}</h3>
-        <p v-if="!modifyClicked">{{ comment }}</p>
+        <p class="comment" v-if="!modifyClicked">{{ comment }}</p>
         <textarea v-if="modifyClicked" name="textarea" v-model="comment"></textarea>
-        <div>
+        <div class="like-date">
             <div v-if="likesChecked">
                 <button @click="likeClicked" v-if="liked" class="liked"><fa icon="thumbs-up" alt="Icone de like"/>{{ shownLikeNumber }}</button>
                 <button @click="likeClicked" v-if="!liked" class="not-liked"><fa icon="thumbs-up" alt="Icone de like"/>{{ shownLikeNumber }}</button>
@@ -13,11 +13,10 @@
             <p>{{ date }}</p>
         </div>
         <p id="likeErrorMessageComment"></p>
-        <button v-if="modifyClicked" @click="modifyComment">Publier</button>
-        <div>
+        <div class="modify-buttons">
+            <button v-if="modifyClicked" @click="modifyComment">Publier</button>
             <button v-if="displayButtons && !modifyClicked" @click="modifyButton">Modifier</button>
             <button v-if="displayButtons || displayButtonsAdmin" @click="deleteComment">Supprimer</button>
-            <input/>
         </div>
     </div>
 </template>
@@ -349,8 +348,94 @@ export default {
 }
 </script>
 
-<style>
-.liked {
-    background-color: blueviolet;
+<style lang="scss">
+div.published-comment {
+    display: flex;
+    flex-direction: column;
+    background-color: #D0F7C5;
+    width: 85%;
+    margin-top: 2em;
+    border-radius: 15px/15px;
+    padding-left: 0.75em;
+    padding-right: 00.75em;
+    padding-bottom: 1em;
+    &>h3 {
+        font-size: 1.1em;
+        color: #4C061D;
+    }
+    &>p.comment {
+        background-color: white;
+        border: #92D5E6 solid 2px;
+        width: 95%;
+        white-space: pre-wrap;
+        padding: 0.75em 0.5em;
+        align-self: center;
+        font-size: 1em;
+    }
+    &>textarea {
+        border: solid 2px #92D5E6;
+        border-radius: 15px/15px;
+        font-size: 1em;
+        margin-bottom: 00.5em;
+    
+    }
+    &>div.like-date {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        font-size: 1em;
+        &>div {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            width: 10%;
+            max-width: 6em;
+            justify-content: space-between;
+            &>button{
+                align-self: center;
+                border-radius: 15px/15px;
+                box-shadow: 2px 2px 3px #0E4749;
+                padding: 0.25em 0.5em;
+                margin-right: 0.25em;
+                min-width: fit-content;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-size: 1em;
+                width: 2.5em;
+                height: 2.5em;
+                cursor: pointer;
+                &.liked {
+                    background-color: #4C061D;
+                    color: white;
+                }
+                &.not-liked {
+                    background-color: white;
+                    color: black;
+                    border: #92D5E6 solid 1px;
+                }
+                
+            }
+        }
+    }
+    &>div.modify-buttons {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        &>button {
+            margin-top: 1em;
+            width: 20%;
+            min-width: fit-content;
+            align-self: center;
+            color: white;
+            background-color: #4C061D;
+            border-radius: 15px/15px;
+            border: none;
+            padding-top: 0.5em;
+            padding-bottom: 0.5em;
+            box-shadow: 2px 2px 3px #11020F;
+            cursor: pointer;
+        }
+    }
 }
 </style>

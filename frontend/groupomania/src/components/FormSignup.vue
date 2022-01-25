@@ -209,6 +209,7 @@ div.form-signup {
         color: #4C061D;
         align-self: center;
         margin-top: 1em;
+        cursor: pointer;
     }
 }
 </style>
