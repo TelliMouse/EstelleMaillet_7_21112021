@@ -10,6 +10,8 @@
         <p class="advice"><fa icon="info-circle" class="icon"/>Vous ne pouvez utiliser votre adresse email qu'une seule fois pour créer un compte</p>
         <label for="password">Mot-de-passe:</label>
         <input v-model="password" type="password" name="password" required>
+        <label for="password-confirmation">Confirmer le mot-de-passe:</label>
+        <input v-model="passwordConfirmation" type="password" name="password-confirmation" required>
         <button @click="signup">S'inscrire</button>
         <router-link to="/login">Déjà inscrit? C'est par ici!</router-link>
     </div>
@@ -23,7 +25,8 @@ export default {
             firstname: '',
             lastname: '',
             email: '',
-            password: ''
+            password: '',
+            passwordConfirmation: ''
         }
     },
     methods: {
@@ -34,6 +37,17 @@ export default {
         isEmailCorrect() {
             const regex = /^.+@.+\.[a-z]+$/;
             return regex.test(this.email);
+        },
+        /**
+         * Verifies if the password and password confirmation are the same
+         * @returns {Boolean}
+         */
+        isPasswordConfirmed() {
+            if(this.password === this.passwordConfirmation) {
+                return true;
+            } else {
+                return false;
+            }
         },
         /**
          * Create a new user through a request to the API
@@ -105,7 +119,7 @@ export default {
          * Create a new user in the database, then authentifies them with login() (see previous function)
          */
         signup() {
-            if(this.isTheFormComplete() && this.isEmailCorrect()) {
+            if(this.isTheFormComplete() && this.isEmailCorrect() && this.isPasswordConfirmed()) {
                 //This first fetch determines if the email is unique, the response's json is as: { unique: Boolean }
                 fetch('http://localhost:3000/api/users/email', {
                     method: 'POST',
@@ -150,8 +164,10 @@ export default {
                     alert('Une erreur s\'est produite');
                 })
                 
-            } else if (this.isTheFormComplete && !this.isEmailCorrect()) {
+            } else if(this.isTheFormComplete && !this.isEmailCorrect()) {
                 alert('Veuillez entrer une adresse email valide');
+            } else if(this.isTheFormComplete && this.isEmailCorrect() && !this.isPasswordConfirmed()) {
+                alert('Veuillez vérifier que vous ayez tapé deux fois le même mot de passe');
             } else {
                 alert('Veuillez remplir tous les champs du formulaire et n\'avoir utilisé qu\'une fois votre email');
             }
@@ -184,10 +200,9 @@ div.form-signup {
         border: 2px solid #92D5E6;
     }
     &>p.advice {
-        text-decoration: underline #4C061D;
+        color: #4C061D;
         align-self: center;
         &>.icon {
-            color: #4C061D;
             margin-right: 0.5em;
         }
     }
