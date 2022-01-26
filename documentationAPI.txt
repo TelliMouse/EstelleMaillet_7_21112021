@@ -11,17 +11,17 @@ POST    /api/users/email        {email: String}
         res                     {unique: Boolean}
 POST    /api/users/password     {email: String, password: String}
         res                     {valid: Boolean}
-POST    /api/posts              {title: String, text: String, imageUrl: String, imageAlt: String, user_id: Integer, date: String}
+POST    /api/posts              FormData.append('image', files); FormData.append('json', modifiedPost) || {title: String, text: String, imageUrl: String, imageAlt: String, user_id: Integer, date: String}
 DELETE  /api/posts/:id          {}
 GET     /api/posts/:id          {}
         res                     {id: Number, title: String, text: String, imageUrl: String, imageAlt: String, user_id: Integer, date: String}
 GET     /api/posts              {}
         res                     { [{...}, {...}...] }
-PUT     /api/posts/:id          {FormData.append('image', files); FormData.append('json', modifiedPost) || modifiedPost: String}
+PUT     /api/posts/:id          FormData.append('image', files); FormData.append('json', modifiedPost) || {title: String, text: String, imageAlt: String, user_id: Integer}
 POST    /api/posts/:id/like     {user_id: Integer, like: 1, -1 or 0}
 GET     /api/posts/:id/comments {}     
         res                     { [{...}, {...}...] }
 POST    /api/comments           {user_id: Number, post_id: Number, text: String, date: String}
-PUT     /api/comments/:id       {modifiedComment: String}
+PUT     /api/comments/:id       {user_id: Number, text: String}
 DELETE  /api/comments/:id       {}
 POST    /api/comments/:id/like  {user_id: Number, like: 1, -1 or 0}
