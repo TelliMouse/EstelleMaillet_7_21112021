@@ -2,7 +2,7 @@
     <div class="blank-comment">
         <h3 v-if="loadName">{{ userName }}</h3>
         <label for="comment">Votre commentaire:</label>
-        <textarea name="text" id="comment" cols="30" rows="10" v-model="comment" placeholder="Ecrivez votre commentaire ici!"></textarea>
+        <textarea name="text" id="comment" v-model="comment" rows="10" placeholder="Ecrivez votre commentaire ici!"></textarea>
         <button @click="publishComment">Publier</button>
     </div>
 </template>

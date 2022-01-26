@@ -7,7 +7,7 @@
         <h2 v-if="loadName">{{ userName }}</h2>
 
         <p class="post-text" v-if="textPost && !modifyClicked">{{ post }}</p>
-        <textarea v-if="textPost && modifyClicked" name="textarea" rows="5" cols="30" v-model="modelPost"></textarea>
+        <textarea v-if="textPost && modifyClicked" name="textarea" rows="10" v-model="modelPost"></textarea>
 
         <img v-if="imagePost && !modifyClicked" :src="imageUrl" :alt="imageAlt"/>
         <div class="image">
@@ -443,10 +443,12 @@ div.published-post {
     padding-left: 1em;
     padding-right: 1em;
     padding-bottom: 1.25em;
-    min-width: fit-content;
+    min-width: min-content;
+    max-width: 85%;
     &>h1 {
         margin-top: 0;
         font-size: 2em;
+        flex-wrap: wrap;
     }
     &>label {
         font-size: 2em;
@@ -509,7 +511,6 @@ div.published-post {
     }
     &>div.like-date {
         display: flex;
-        flex-direction: row;
         justify-content: space-between;
         font-size: 1em;
         &>div {
@@ -571,6 +572,20 @@ div.published-post {
         align-self: center;
         color: #4C061D;
         cursor: pointer;
+    }
+}
+@media all and (min-width: 768px) { //desktop + tablet
+    div.published-post {
+        &>div.like-date {
+            flex-direction: row;
+        }
+    }
+}
+@media all and (max-width: 767px) { //phone
+    div.published-post {
+        &>div.like-date {
+            flex-direction: column;
+        }
     }
 }
 </style>

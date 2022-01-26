@@ -382,7 +382,6 @@ div.published-comment {
     }
     &>div.like-date {
         display: flex;
-        flex-direction: row;
         justify-content: space-between;
         font-size: 1em;
         &>div {
@@ -436,6 +435,20 @@ div.published-comment {
             padding-bottom: 0.5em;
             box-shadow: 2px 2px 3px #11020F;
             cursor: pointer;
+        }
+    }
+}
+@media all and (min-width: 768px) { //desktop + tablet
+    div.published-comment {
+        &>div.like-date {
+            flex-direction: row;
+        }
+    }
+}
+@media all and (max-width: 767px) { //phone
+    div.published-comment {
+        &>div.like-date {
+            flex-direction: column;
         }
     }
 }

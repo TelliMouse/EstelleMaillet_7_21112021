@@ -13,7 +13,7 @@
                 <label for="image">Image</label>
             </div>
         </div>
-        <textarea v-if="textIsChecked" name="post" id="textPost" cols="30" rows="10" placeholder="Rédigez votre post ici!" v-model="modelTextPost"></textarea>
+        <textarea v-if="textIsChecked" name="post" id="textPost" rows="10" placeholder="Rédigez votre post ici!" v-model="modelTextPost"></textarea>
         <div class="image" v-if="imageIsChecked">
             <label for="imagePost">Choisissez une image à publier:</label>
             <input @input="addFile" type="file" name="image" id="imagePost" accept="image/jpg, image/jpeg, image/png, image/gif, image/bmp, image/webp, image/svg+xml" />
