@@ -78,8 +78,8 @@ export default {
             })
             .then(res => res.json())
             .then(result => {
-                const likeList = result.usersLike;
-                const dislikeList = result.usersDislike;
+                const likeList = JSON.parse(result.usersLike);
+                const dislikeList = JSON.parse(result.usersDislike);
                 //Assign true to liked when the user has liked the comment
                 if(likeList != []) {
                     for(let userId of likeList) {

@@ -102,14 +102,14 @@ export default {
          */
         hasTheUserAlreadyLiked() {
             //First we find the post in the database
-            const currentUserId = localStorage.getItem('currentUserId');
+            const currentUserId = parseInt(localStorage.getItem('currentUserId'), 10);
             fetch(`http://localhost:3000/api/posts/${this.postId}`, {
                 credentials: 'include'
             })
             .then(res => res.json())
             .then(result => {
-                const likeList = result[0].usersLike;
-                const dislikeList = result[0].usersDislike;
+                const likeList = JSON.parse(result[0].usersLike);
+                const dislikeList = JSON.parse(result[0].usersDislike);
                 //Assign true to liked when the user has liked the post
                 if(likeList != []) {
                     for(let userId of likeList) {
